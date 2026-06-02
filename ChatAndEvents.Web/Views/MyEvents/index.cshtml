@@ -1,0 +1,37 @@
+﻿@model ChatAndEvents.Web.Models.MyEventsViewModel
+
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="px-2 py-3">
+    <h2 class="mb-4">My Events</h2>
+
+    @if (Model.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.IsEmpty)
+    {
+        <p class="text-muted text-center py-5">You haven't created any events yet.</p>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var ev in Model.Events)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <div>
+                        <div class="fw-semibold">@ev.Name</div>
+                        <div class="text-muted small d-flex gap-3 mt-1">
+                            <span>@ev.Location</span>
+                            <span>@ev.StartDateTime.ToString("dd MMM yyyy")</span>
+                        </div>
+                    </div>
+                    <span class="text-muted">›</span>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,93 @@
+@model ChatAndEvents.Web.Models.CommunityDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Community.Name;
+}
+
+<div class="hub-page">
+    <div class="detail-header">
+        <div class="detail-heading">
+            <h1>@Model.Community.Name</h1>
+            <p>@Model.Community.Description</p>
+            <span class="badge text-bg-secondary">@Model.Community.Category</span>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+
+    @if (TempData["CommunityMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["CommunityMessage"]</div>
+    }
+
+    <div class="hub-grid">
+        <section class="hub-panel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Members</h2>
+                @if (Model.IsCurrentUserMember)
+                {
+                    <form asp-action="Leave" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Community.Id" />
+                        <button type="submit" class="btn btn-outline-danger" disabled="@Model.IsCurrentUserAdmin">Leave</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="Join" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Community.Id" />
+                        <button type="submit" class="btn btn-primary">Join</button>
+                    </form>
+                }
+            </div>
+            <div class="member-list">
+                @foreach (var member in Model.Community.Members.OrderByDescending(member => member.IsAdmin).ThenBy(member => member.User?.Username))
+                {
+                    <div class="member-row">
+                        <span>@(member.User?.Username ?? "User")</span>
+                        @if (member.IsAdmin)
+                        {
+                            <strong>Admin</strong>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+
+        <section class="hub-panel">
+            <h2>Posts</h2>
+            @if (Model.IsCurrentUserMember)
+            {
+                <form asp-action="AddPost" method="post" class="stack-form mb-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Community.Id" />
+                    <input name="title" class="form-control" placeholder="Post title" maxlength="160" required />
+                    <textarea name="body" class="form-control" rows="3" placeholder="Write something" maxlength="4000" required></textarea>
+                    <button type="submit" class="btn btn-success">Post</button>
+                </form>
+            }
+            else
+            {
+                <p class="text-muted">Join this community to post.</p>
+            }
+
+            <div class="post-list">
+                @if (!Model.Community.Posts.Any())
+                {
+                    <p class="text-muted mb-0">No posts yet.</p>
+                }
+                else
+                {
+                    @foreach (var post in Model.Community.Posts)
+                    {
+                        <article class="post-card">
+                            <h3>@post.Title</h3>
+                            <p>@post.Body</p>
+                            <small>@(post.Author?.Username ?? "User") · @post.CreatedAt.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</small>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    </div>
+</div>

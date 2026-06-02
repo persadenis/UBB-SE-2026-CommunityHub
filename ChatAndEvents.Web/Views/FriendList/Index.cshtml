@@ -1,0 +1,83 @@
+@model ChatAndEvents.Web.Models.FriendListViewModel
+
+@{
+    ViewData["Title"] = "Friends";
+}
+
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Friends</h2>
+            <p class="text-muted mb-0">Manage your friends and start direct conversations.</p>
+        </div>
+        <div class="d-flex gap-2 align-items-start">
+            <a asp-controller="FriendRequests" asp-action="Index" class="btn btn-outline-primary">Requests</a>
+            <a asp-controller="Profile" asp-action="Index" class="btn btn-outline-secondary">My Profile</a>
+        </div>
+    </div>
+
+    <form asp-action="SendFriendRequest" method="post" class="row g-2 align-items-start mb-3">
+        <div class="col-12 col-md">
+            <label asp-for="FriendUsernameInput" class="form-label">Add friend by username</label>
+            <input asp-for="FriendUsernameInput" class="form-control" placeholder="Username" />
+        </div>
+        <div class="col-12 col-md-auto pt-md-4">
+            <button type="submit" class="btn btn-primary w-100">Add</button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.FriendActionMessage))
+    {
+        <div class="alert alert-info">@Model.FriendActionMessage</div>
+    }
+
+    @if (!Model.HasFriends)
+    {
+        <div class="alert alert-secondary">
+            No friends found. Accept requests to start chatting.
+        </div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var friend in Model.Friends)
+            {
+                <div class="list-group-item">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="friend-avatar">
+                                @if (friend.HasAvatar)
+                                {
+                                    <img src="@friend.AvatarUrl" alt="@friend.Username avatar" />
+                                }
+                                else
+                                {
+                                    <span>@friend.AvatarInitial</span>
+                                }
+                            </div>
+                            <div>
+                                <h5 class="mb-1">@friend.Username</h5>
+                                <div class="text-muted small">@friend.StatusLabel</div>
+                                @if (!string.IsNullOrWhiteSpace(friend.Bio))
+                                {
+                                    <div class="small mt-1">@friend.Bio</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <a asp-controller="Profile" asp-action="Index" asp-route-userId="@friend.Id" class="btn btn-sm btn-outline-secondary">Profile</a>
+                            <form asp-action="OpenDirectMessage" method="post">
+                                <input type="hidden" name="friendId" value="@friend.Id" />
+                                <button type="submit" class="btn btn-sm btn-primary">DM</button>
+                            </form>
+                            <form asp-action="Remove" method="post">
+                                <input type="hidden" name="friendId" value="@friend.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

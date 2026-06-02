@@ -1,0 +1,178 @@
+@model ChatAndEvents.Web.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = Model.IsOwnProfile ? "My Profile" : "Profile";
+}
+
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">@ViewData["Title"]</h2>
+            <p class="text-muted mb-0">@Model.Username</p>
+        </div>
+        <a asp-controller="FriendList" asp-action="Index" class="btn btn-outline-secondary align-self-start">Friends</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ActionMessage))
+    {
+        <div class="alert alert-info">@Model.ActionMessage</div>
+    }
+
+    <div class="profile-panel mb-4">
+        <div class="d-flex flex-column flex-md-row gap-4">
+            <div class="profile-avatar">
+                @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+                {
+                    <img src="@Model.AvatarUrl" alt="@Model.Username avatar" />
+                }
+                else
+                {
+                    <span>@Model.AvatarInitial</span>
+                }
+            </div>
+
+            <div class="flex-grow-1">
+                <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                    <h3 class="mb-0">@Model.Username</h3>
+                    @if (Model.IsBirthdayToday)
+                    {
+                        <span class="badge text-bg-warning">Birthday today</span>
+                    }
+                    <span class="badge text-bg-secondary">@Model.StatusLabel</span>
+                    @if (Model.IsBlocked)
+                    {
+                        <span class="badge text-bg-danger">Blocked</span>
+                    }
+                </div>
+
+                <p class="mb-1">@Model.DisplayBio</p>
+                <div class="text-muted small">@Model.BirthdayText</div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IsOwnProfile)
+    {
+        <div class="profile-panel mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+                <div>
+                    <h4 class="mb-1">Matchmaking</h4>
+                    <p class="text-muted mb-0">
+                        @(Model.IsMatchmakingEnabled
+                            ? "Your matchmaking profile is active."
+                            : "Matchmaking is off until you choose to enable it.")
+                    </p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    @if (Model.IsMatchmakingEnabled)
+                    {
+                        <a asp-controller="Matchmaking" asp-action="Index" class="btn btn-primary">Open Matchmaking</a>
+                    }
+                    <a asp-controller="Matchmaking" asp-action="Edit" class="btn @(Model.IsMatchmakingEnabled ? "btn-outline-primary" : "btn-success")">
+                        @(Model.HasMatchmakingProfile ? "Edit Matchmaking" : "Enable Matchmaking")
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Save" method="post" class="profile-panel">
+            <div class="mb-3">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea id="bio" name="bio" class="form-control" rows="4">@Model.Bio</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="avatarUrl" class="form-label">Avatar URL</label>
+                <input id="avatarUrl" name="avatarUrl" value="@Model.AvatarUrl" class="form-control" />
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        @foreach (var status in Model.AvailableStatuses)
+                        {
+                            <option value="@status" selected="@(status == Model.Status)">@status</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label for="birthday" class="form-label">Birthday</label>
+                    <input id="birthday" name="birthday" type="date" value="@(Model.Birthday?.ToString("yyyy-MM-dd"))" class="form-control" />
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Save</button>
+        </form>
+    }
+    else
+    {
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            @if (Model.CanSendFriendRequest)
+            {
+                <form asp-action="SendFriendRequest" method="post">
+                    <input type="hidden" name="userId" value="@Model.UserId" />
+                    <button type="submit" class="btn btn-primary">Send Friend Request</button>
+                </form>
+            }
+            else if (Model.RelationshipStatus.HasValue)
+            {
+                <span class="btn btn-outline-secondary disabled">Relationship: @Model.RelationshipStatus</span>
+            }
+
+            @if (Model.IsBlocked)
+            {
+                <form asp-action="Unblock" method="post">
+                    <input type="hidden" name="userId" value="@Model.UserId" />
+                    <button type="submit" class="btn btn-outline-secondary">Unblock</button>
+                </form>
+            }
+            else
+            {
+                <form asp-action="Block" method="post">
+                    <input type="hidden" name="userId" value="@Model.UserId" />
+                    <button type="submit" class="btn btn-outline-danger">Block</button>
+                </form>
+            }
+
+            <form asp-action="OpenDirectMessage" method="post">
+                <input type="hidden" name="userId" value="@Model.UserId" />
+                <button type="submit" class="btn btn-success">Open DM</button>
+            </form>
+        </div>
+
+        <div class="profile-panel">
+            <h4 class="mb-3">Mutual Friends (@Model.MutualFriends.Count)</h4>
+            @if (!Model.HasMutualFriends)
+            {
+                <p class="text-muted mb-0">No mutual friends found.</p>
+            }
+            else
+            {
+                <div class="list-group">
+                    @foreach (var friend in Model.MutualFriends)
+                    {
+                        <a asp-controller="Profile" asp-action="Index" asp-route-userId="@friend.Id" class="list-group-item list-group-item-action">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="friend-avatar friend-avatar-sm">
+                                    @if (friend.HasAvatar)
+                                    {
+                                        <img src="@friend.AvatarUrl" alt="@friend.Username avatar" />
+                                    }
+                                    else
+                                    {
+                                        <span>@friend.AvatarInitial</span>
+                                    }
+                                </div>
+                                <div>
+                                    <strong>@friend.Username</strong>
+                                    <div class="text-muted small">@friend.StatusLabel</div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,52 @@
+@model ChatAndEvents.Web.Models.CreateEventViewModel
+
+<div class="card">
+    <div class="card-body p-4">
+        <h2 class="h4 mb-1">Step 1 of 3</h2>
+        <p class="text-muted mb-4">Basic event information and schedule.</p>
+
+        <form asp-action="GoToStep2" method="post" class="row g-3">
+            <div class="col-12">
+                <label class="form-label" asp-for="EventName">Event Name</label>
+                <input class="form-control" asp-for="EventName" />
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" asp-for="Location">Location</label>
+                <input class="form-control" asp-for="Location" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="StartDate">Start Date</label>
+                <input class="form-control" id="StartDate" name="StartDate" type="date" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="StartTime">Start Time</label>
+                <input class="form-control" id="StartTime" name="StartTime" type="time" value="@Model.StartTime.ToString(@"hh\:mm")" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="EndDate">End Date</label>
+                <input class="form-control" id="EndDate" name="EndDate" type="date" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" for="EndTime">End Time</label>
+                <input class="form-control" id="EndTime" name="EndTime" type="time" value="@Model.EndTime.ToString(@"hh\:mm")" />
+            </div>
+
+            <div class="col-12">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" asp-for="IsPublic" />
+                    <label class="form-check-label" asp-for="IsPublic">Public event</label>
+                </div>
+            </div>
+
+            <div class="col-12 d-flex justify-content-between align-items-center pt-2">
+                <button type="submit" class="btn btn-outline-secondary" formaction="@Url.Action("Cancel", "CreateEvent")" formmethod="post">Cancel</button>
+                <button type="submit" class="btn btn-primary">Next</button>
+            </div>
+        </form>
+    </div>
+</div>

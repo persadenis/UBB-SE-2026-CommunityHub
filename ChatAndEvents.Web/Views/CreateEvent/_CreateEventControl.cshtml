@@ -1,0 +1,27 @@
+@model ChatAndEvents.Web.Models.CreateEventViewModel
+
+<div class="wizard-shell">
+    <div class="wizard-steps">
+        <div class="wizard-step @(Model.CurrentStep >= 1 ? "active" : string.Empty)">1. Basics</div>
+        <div class="wizard-step @(Model.CurrentStep >= 2 ? "active" : string.Empty)">2. Details</div>
+        <div class="wizard-step @(Model.CurrentStep >= 3 ? "active" : string.Empty)">3. Quests</div>
+    </div>
+
+    @if (Model.HasError)
+    {
+        <div class="alert alert-danger mb-4">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.IsStep1Visible)
+    {
+        <partial name="_CreateEventStep1" model="Model" />
+    }
+    else if (Model.IsStep2Visible)
+    {
+        <partial name="_CreateEventStep2" model="Model" />
+    }
+    else
+    {
+        <partial name="_CreateEventStep3" model="Model" />
+    }
+</div>

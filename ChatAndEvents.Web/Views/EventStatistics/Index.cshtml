@@ -1,0 +1,115 @@
+@model ChatAndEvents.Web.Models.EventStatisticsViewModel
+
+@{
+    ViewData["Title"] = "Event Statistics";
+}
+
+<div class="statistics-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Event Statistics</h1>
+            <p class="text-muted mb-0">@Model.EventName</p>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="EventDetail" asp-action="Index" asp-route-eventId="@Model.EventId">Back</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <section class="stat-grid">
+        <div class="stat-card">
+            <span>Total Participants</span>
+            <strong>@Model.ParticipantOverview.TotalParticipants</strong>
+        </div>
+        <div class="stat-card">
+            <span>Active Participants</span>
+            <strong>@Model.ParticipantOverview.ActiveParticipants</strong>
+        </div>
+        <div class="stat-card">
+            <span>Engagement Rate</span>
+            <strong>@Model.ParticipantOverview.EngagementRate.ToString("0.##")%</strong>
+        </div>
+        <div class="stat-card">
+            <span>Discussion Messages</span>
+            <strong>@Model.EngagementBreakdown.TotalDiscussionMessages</strong>
+        </div>
+        <div class="stat-card">
+            <span>Memories</span>
+            <strong>@Model.EngagementBreakdown.TotalMemories</strong>
+        </div>
+        <div class="stat-card">
+            <span>Quest Submissions</span>
+            <strong>@Model.EngagementBreakdown.TotalQuestSubmissions</strong>
+        </div>
+    </section>
+
+    <section class="statistics-section">
+        <h2>Participant Leaderboard</h2>
+        @if (Model.Leaderboard.Count == 0)
+        {
+            <p class="text-muted">No leaderboard entries yet.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Tier</th>
+                        <th>Messages</th>
+                        <th>Memories</th>
+                        <th>Quests</th>
+                        <th>Score</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var entry in Model.Leaderboard)
+                    {
+                        <tr>
+                            <td>@entry.UserName</td>
+                            <td>@entry.Tier</td>
+                            <td>@entry.TotalMessages</td>
+                            <td>@entry.TotalMemories</td>
+                            <td>@entry.QuestsCompleted</td>
+                            <td><strong>@entry.TotalScore</strong></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="statistics-section">
+        <h2>Quest Analytics</h2>
+        @if (Model.QuestAnalytics.Count == 0)
+        {
+            <p class="text-muted">No quest analytics yet.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                    <tr>
+                        <th>Quest</th>
+                        <th>Completed</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var quest in Model.QuestAnalytics)
+                    {
+                        <tr>
+                            <td>@quest.QuestName</td>
+                            <td>@quest.TotalCompletedQuests</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

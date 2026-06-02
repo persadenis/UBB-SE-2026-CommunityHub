@@ -1,0 +1,97 @@
+@model ChatAndEvents.Web.Models.MatchmakingEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Matchmaking";
+}
+
+<div class="hub-page">
+    <div class="detail-header">
+        <div class="detail-heading">
+            <h1>Matchmaking Profile</h1>
+            <p>This is separate from your normal account profile and is visible only when matchmaking is enabled.</p>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="hub-panel stack-form">
+        @Html.AntiForgeryToken()
+        <input asp-for="ExistingPhotoUrls" type="hidden" />
+        <div class="form-check form-switch">
+            <input asp-for="IsEnabled" class="form-check-input" type="checkbox" />
+            <label asp-for="IsEnabled" class="form-check-label">Enable matchmaking</label>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="DisplayName" class="form-label">Display name</label>
+                <input asp-for="DisplayName" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Location" class="form-label">Location</label>
+                <select asp-for="Location" class="form-select" required>
+                    <option value="">Select location</option>
+                    @foreach (var location in MatchmakingEditViewModel.LocationOptions)
+                    {
+                        <option value="@location" selected="@(location == Model.Location)">@location</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Gender" class="form-label">Gender</label>
+                <select asp-for="Gender" class="form-select" required>
+                    <option value="">Select gender</option>
+                    @foreach (var gender in MatchmakingEditViewModel.GenderOptions)
+                    {
+                        <option value="@gender" selected="@(gender == Model.Gender)">@gender</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PreferredGenders" class="form-label">Preferred gender(s)</label>
+                <select asp-for="PreferredGenderSelections" class="form-select" multiple size="4" required>
+                    @foreach (var preference in MatchmakingEditViewModel.PreferredGenderOptions)
+                    {
+                        <option value="@preference" selected="@Model.PreferredGenderSelections.Contains(preference)">@preference</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="MinPreferredAge" class="form-label">Min age</label>
+                <input asp-for="MinPreferredAge" class="form-control" type="number" min="18" max="99" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="MaxPreferredAge" class="form-label">Max age</label>
+                <input asp-for="MaxPreferredAge" class="form-control" type="number" min="18" max="99" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="MaxDistanceKm" class="form-label">Max distance km</label>
+                <input asp-for="MaxDistanceKm" class="form-control" type="number" min="1" max="1000" />
+            </div>
+        </div>
+
+        <label asp-for="LoverType" class="form-label">Lover type / vibe</label>
+        <input asp-for="LoverType" class="form-control" placeholder="Adventure seeker, cozy planner, spontaneous..." />
+
+        <label asp-for="DatingBio" class="form-label">Dating bio</label>
+        <textarea asp-for="DatingBio" class="form-control" rows="4" maxlength="1000"></textarea>
+
+        <label asp-for="Interests" class="form-label">Interests</label>
+        <textarea asp-for="Interests" class="form-control" rows="3" placeholder="Music, Travel, Gaming"></textarea>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ExistingPhotoUrls))
+        {
+            <div class="wp-photo-preview-grid">
+                @foreach (var photoUrl in Model.ExistingPhotoUrls.Split(['\r', '\n'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                {
+                    <img src="@photoUrl" alt="Matchmaking profile photo" />
+                }
+            </div>
+        }
+
+        <label asp-for="PhotoFiles" class="form-label">Upload photos from device</label>
+        <input asp-for="PhotoFiles" class="form-control" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple />
+        <div class="form-text">You can upload up to 6 photos. JPG, PNG, and WebP are supported.</div>
+
+        <button type="submit" class="btn btn-primary">Save Matchmaking Profile</button>
+    </form>
+</div>

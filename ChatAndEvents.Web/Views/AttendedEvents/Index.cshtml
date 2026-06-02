@@ -1,0 +1,106 @@
+﻿@model ChatAndEvents.Web.Models.AttendedEventsViewModel
+
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="px-2 py-3">
+    <h2 class="mb-3">My Events</h2>
+
+    @if (Model.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="get" class="row g-2 mb-4 align-items-center">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@Model.SearchQuery" class="form-control" placeholder="Search events by title..." />
+        </div>
+        <div class="col-md-3">
+            <select name="categoryId" class="form-select">
+                <option value="">Category</option>
+                @foreach (var category in Model.AvailableCategories)
+                {
+                    <option value="@category.CategoryId" selected="@(Model.SelectedCategoryId == category.CategoryId)">@category.Title</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="sort" class="form-select">
+                @foreach (var option in new[] { "Default", "TitleAscending", "TitleDescending", "CategoryAscending", "CategoryDescending", "StartDateAscending", "StartDateDescending", "EndDateAscending", "EndDateDescending" })
+                {
+                    <option value="@option" selected="@(Model.SelectedSort == option)">@option</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="/AttendedEvents" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+
+    <ul class="nav nav-tabs" id="eventsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#attending" type="button">
+                Attending
+                <span class="badge bg-secondary ms-1">@Model.AttendedEvents.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#archived" type="button">
+                Archived
+                <span class="badge bg-secondary ms-1">@Model.ArchivedEvents.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#favourites" type="button">
+                Favourites
+                <span class="badge bg-warning text-dark ms-1">@Model.FavouriteEvents.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#common" type="button">
+                Common Events
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content border border-top-0 rounded-bottom p-3" id="eventsTabContent">
+        <div class="tab-pane fade show active" id="attending" role="tabpanel">
+            @if (!Model.AttendedEvents.Any())
+            {
+                <p class="text-muted text-center py-4">No events found.</p>
+            }
+            else
+            {
+                @await Html.PartialAsync("_EventCards", (Model.AttendedEvents, Model.SearchQuery, Model.SelectedCategoryId, Model.SelectedSort, "Attending"))
+            }
+        </div>
+
+        <div class="tab-pane fade" id="archived" role="tabpanel">
+            @if (!Model.ArchivedEvents.Any())
+            {
+                <p class="text-muted text-center py-4">No archived events.</p>
+            }
+            else
+            {
+                @await Html.PartialAsync("_EventCards", (Model.ArchivedEvents, Model.SearchQuery, Model.SelectedCategoryId, Model.SelectedSort, "Archived"))
+            }
+        </div>
+
+        <div class="tab-pane fade" id="favourites" role="tabpanel">
+            @if (!Model.FavouriteEvents.Any())
+            {
+                <p class="text-muted text-center py-4">No favourite events.</p>
+            }
+            else
+            {
+                @await Html.PartialAsync("_EventCards", (Model.FavouriteEvents, Model.SearchQuery, Model.SelectedCategoryId, Model.SelectedSort, "Favourites"))
+            }
+        </div>
+
+        <div class="tab-pane fade" id="common" role="tabpanel">
+            <p class="text-muted text-center py-4">Common events with friends — coming soon.</p>
+        </div>
+    </div>
+</div>

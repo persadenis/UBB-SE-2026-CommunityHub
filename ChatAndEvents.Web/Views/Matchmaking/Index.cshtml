@@ -1,0 +1,221 @@
+@model ChatAndEvents.Web.Models.MatchmakingIndexViewModel
+
+@{
+    ViewData["Title"] = "Matchmaking";
+    var currentCandidate = Model.CurrentCandidate;
+}
+
+<div class="hub-page wp-board-page">
+    <div class="page-title-row wp-mm-title-row">
+        <div>
+            <h1>Discover</h1>
+            <p class="text-muted mb-0">Swipe through one profile at a time. Mutual likes become matches you can add and message.</p>
+        </div>
+        <a asp-action="Edit" class="btn wp-primary-button">Edit Matchmaking Profile</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(TempData["MatchmakingMessage"] as string))
+    {
+        <div class="wp-mm-toast">@TempData["MatchmakingMessage"]</div>
+    }
+
+    @if (!Model.HasEnabledProfile)
+    {
+        <section class="hub-panel wp-match-empty">
+            <div class="wp-match-avatar">Love</div>
+            <h2>Matchmaking is off</h2>
+            <p class="text-muted">Your account still works everywhere else. Enable matchmaking only if you want to appear in discovery.</p>
+            <a asp-action="Edit" class="btn wp-primary-button">Enable Matchmaking</a>
+        </section>
+    }
+    else
+    {
+        <section class="wp-mm-profile-strip">
+            <div>
+                <strong>@Model.Profile!.DisplayName</strong>
+                <span>@Model.Profile.Location &middot; @Model.Profile.Gender &middot; looking for @Model.Profile.PreferredGenders</span>
+            </div>
+            <form asp-action="Disable" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-light btn-sm">Hide From Matchmaking</button>
+            </form>
+        </section>
+
+        <div class="wp-mm-layout" id="matchmaking-deck">
+            <section class="wp-mm-discover-shell" aria-label="Matchmaking discovery">
+                @if (currentCandidate == null)
+                {
+                    <div class="wp-mm-empty-state">
+                        <h2>No more profiles to discover</h2>
+                        <p>New people will appear here after they activate matchmaking.</p>
+                    </div>
+                }
+                else
+                {
+                    var candidatePhotos = currentCandidate.Profile.Photos.OrderBy(photo => photo.SortOrder).ToList();
+                    var firstPhoto = candidatePhotos.FirstOrDefault()?.Url;
+
+                    <article class="wp-mm-discover-card">
+                        <div class="wp-mm-photo-pane" data-photo-gallery>
+                            @if (candidatePhotos.Any())
+                            {
+                                @for (var index = 0; index < candidatePhotos.Count; index++)
+                                {
+                                    <img src="@candidatePhotos[index].Url"
+                                         alt="@currentCandidate.Profile.DisplayName"
+                                         class="wp-mm-photo @(index == 0 ? "is-active" : string.Empty)"
+                                         data-photo-index="@index" />
+                                }
+
+                                @if (candidatePhotos.Count > 1)
+                                {
+                                    <button type="button" class="wp-mm-photo-nav is-prev" data-photo-prev aria-label="Previous photo">&#8249;</button>
+                                    <button type="button" class="wp-mm-photo-nav is-next" data-photo-next aria-label="Next photo">&#8250;</button>
+                                }
+                            }
+                            else
+                            {
+                                <div class="wp-mm-photo-fallback">@currentCandidate.Profile.DisplayName.Substring(0, 1).ToUpperInvariant()</div>
+                            }
+                        </div>
+
+                        <div class="wp-mm-details-pane">
+                            <div>
+                                <h2>@currentCandidate.Profile.DisplayName</h2>
+                                <div class="wp-mm-meta">
+                                    <span>@currentCandidate.Profile.Gender</span>
+                                    <span>@currentCandidate.Profile.Location</span>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(currentCandidate.Profile.LoverType))
+                            {
+                                <div class="wp-mm-info-line">
+                                    <strong>Lover type</strong>
+                                    <span>@currentCandidate.Profile.LoverType</span>
+                                </div>
+                            }
+
+                            <div class="wp-mm-divider"></div>
+
+                            <div>
+                                <h3>Description</h3>
+                                <p>@currentCandidate.Profile.DatingBio</p>
+                            </div>
+
+                            <div class="wp-mm-divider"></div>
+
+                            <div>
+                                <h3>Interests</h3>
+                                @if (currentCandidate.SharedInterests.Any())
+                                {
+                                    <div class="wp-mm-chip-row">
+                                        @foreach (var interest in currentCandidate.SharedInterests)
+                                        {
+                                            <span>@interest</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p class="wp-mm-muted">No shared interests yet.</p>
+                                }
+                            </div>
+                        </div>
+                    </article>
+
+                    <form asp-action="React" method="post" class="wp-mm-action-row">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="targetUserId" value="@currentCandidate.Profile.UserId" />
+                        <button type="submit" name="action" value="Pass" class="wp-mm-circle-action is-pass" aria-label="Pass">
+                            <span>&times;</span>
+                        </button>
+                        <button type="submit" name="action" value="SuperLike" class="wp-mm-circle-action is-super" aria-label="Super Like">
+                            <span>&#9733;</span>
+                        </button>
+                        <button type="submit" name="action" value="Like" class="wp-mm-circle-action is-like" aria-label="Like">
+                            <span>&#10084;</span>
+                        </button>
+                    </form>
+                }
+            </section>
+
+            <aside class="wp-mm-match-panel">
+                <div class="wp-mm-match-heading">
+                    <div>
+                        <h2>Matches</h2>
+                        <p>Mutual likes from matchmaking.</p>
+                    </div>
+                    <span>@Model.Matches.Count</span>
+                </div>
+
+                @if (!Model.Matches.Any())
+                {
+                    <div class="wp-mm-match-empty">No mutual matches yet.</div>
+                }
+                else
+                {
+                    <div class="wp-mm-match-list">
+                        @foreach (var match in Model.Matches)
+                        {
+                            var matchPhoto = match.Profile.Photos.OrderBy(photo => photo.SortOrder).FirstOrDefault()?.Url;
+                            var isFriend = Model.IsFriend(match.Profile.UserId);
+
+                            <article class="wp-mm-match-card">
+                                <div class="wp-mm-match-avatar">
+                                    @if (!string.IsNullOrWhiteSpace(matchPhoto))
+                                    {
+                                        <img src="@matchPhoto" alt="@match.Profile.DisplayName" />
+                                    }
+                                    else
+                                    {
+                                        <span>@match.Profile.DisplayName.Substring(0, 1).ToUpperInvariant()</span>
+                                    }
+                                </div>
+                                <div class="wp-mm-match-info">
+                                    <strong>@match.Profile.DisplayName</strong>
+                                    <span>@match.Profile.Location</span>
+                                </div>
+                                <div class="wp-mm-match-actions">
+                                    @if (!isFriend)
+                                    {
+                                        <form asp-action="AddMatchedFriend" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="targetUserId" value="@match.Profile.UserId" />
+                                            <button type="submit" class="btn btn-sm wp-mm-friend-button">Add Friend</button>
+                                        </form>
+                                    }
+                                    <form asp-action="OpenMatchChat" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="targetUserId" value="@match.Profile.UserId" />
+                                        <button type="submit" class="btn btn-sm wp-mm-chat-button">@(isFriend ? "Chat" : "Add & Chat")</button>
+                                    </form>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </aside>
+        </div>
+    }
+</div>
+
+<script>
+    document.querySelectorAll("[data-photo-gallery]").forEach((gallery) => {
+        const photos = Array.from(gallery.querySelectorAll("[data-photo-index]"));
+        if (photos.length < 2) {
+            return;
+        }
+
+        let currentIndex = 0;
+        const showPhoto = (index) => {
+            currentIndex = (index + photos.length) % photos.length;
+            photos.forEach((photo, photoIndex) => {
+                photo.classList.toggle("is-active", photoIndex === currentIndex);
+            });
+        };
+
+        gallery.querySelector("[data-photo-prev]")?.addEventListener("click", () => showPhoto(currentIndex - 1));
+        gallery.querySelector("[data-photo-next]")?.addEventListener("click", () => showPhoto(currentIndex + 1));
+    });
+</script>

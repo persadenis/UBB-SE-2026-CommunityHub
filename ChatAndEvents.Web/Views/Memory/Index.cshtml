@@ -1,0 +1,142 @@
+﻿@model ChatAndEvents.Web.Models.MemoryViewModel
+
+<div class="container mt-3">
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (!Model.ShowGallery)
+    {
+        @* ── Toolbar ── *@
+        <div class="d-flex gap-2 flex-wrap mb-3">
+            <a asp-action="Index"
+               asp-route-eventId="@Model.EventId"
+               asp-route-showOnlyMine="@(!Model.ShowOnlyMine)"
+               asp-route-sortAscending="@Model.SortAscending"
+               class="btn btn-sm @(Model.ShowOnlyMine ? "btn-primary" : "btn-outline-primary")">
+                My Memories
+            </a>
+            <a asp-action="Index"
+               asp-route-eventId="@Model.EventId"
+               asp-route-showOnlyMine="@Model.ShowOnlyMine"
+               asp-route-sortAscending="true"
+               class="btn btn-sm btn-outline-secondary">Date ↑</a>
+            <a asp-action="Index"
+               asp-route-eventId="@Model.EventId"
+               asp-route-showOnlyMine="@Model.ShowOnlyMine"
+               asp-route-sortAscending="false"
+               class="btn btn-sm btn-outline-secondary">Date ↓</a>
+            <a asp-action="Index"
+               asp-route-eventId="@Model.EventId"
+               asp-route-showGallery="true"
+               class="btn btn-sm btn-outline-secondary">📷 Gallery</a>
+        </div>
+
+        @* ── Add Memory Form ── *@
+        <div class="card mb-3">
+            <div class="card-body">
+                <form asp-action="Add" method="post">
+                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                    <input type="hidden" name="showOnlyMine" value="@Model.ShowOnlyMine" />
+                    <input type="hidden" name="sortAscending" value="@Model.SortAscending" />
+                    <div class="mb-2">
+                        <textarea name="text" class="form-control" rows="2"
+                                  placeholder="Share a memory..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">+ Add Memory</button>
+                </form>
+            </div>
+        </div>
+
+        @* ── Memory List ── *@
+        @if (Model.Memories.Count == 0)
+        {
+            <p class="text-muted text-center mt-4">No memories yet. Be the first to add one!</p>
+        }
+
+        @foreach (var item in Model.Memories)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(item.Memory.PhotoPath))
+                    {
+                        <img src="@item.Memory.PhotoPath" class="img-fluid rounded mb-2"
+                             style="max-height:250px" alt="memory photo" />
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(item.Memory.Text))
+                    {
+                        <p class="mb-2">@item.Memory.Text</p>
+                    }
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                @item.Memory.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+                            </small><br />
+                            <small class="text-muted">@(item.Memory.Author?.Name ?? "")</small>
+                        </div>
+
+                        <div class="d-flex gap-2 align-items-center">
+                            <span>@item.Memory.LikesCount ♥</span>
+
+                            @if (item.CanLike)
+                            {
+                                <form asp-action="ToggleLike" method="post" class="d-inline">
+                                    <input type="hidden" name="memoryId" value="@item.Memory.MemoryId" />
+                                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                                    <input type="hidden" name="showOnlyMine" value="@Model.ShowOnlyMine" />
+                                    <input type="hidden" name="sortAscending" value="@Model.SortAscending" />
+                                    <button type="submit"
+                                            class="btn btn-sm @(item.Memory.IsLikedByCurrentUser ? "btn-danger" : "btn-outline-danger")">
+                                        @(item.Memory.IsLikedByCurrentUser ? "♥ Unlike" : "♥ Like")
+                                    </button>
+                                </form>
+                            }
+
+                            @if (item.CanDelete)
+                            {
+                                <form asp-action="Delete" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this memory?')">
+                                    <input type="hidden" name="memoryId" value="@item.Memory.MemoryId" />
+                                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                                    <input type="hidden" name="showOnlyMine" value="@Model.ShowOnlyMine" />
+                                    <input type="hidden" name="sortAscending" value="@Model.SortAscending" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">🗑</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        @* ── Gallery ── *@
+        <div class="mb-3 d-flex align-items-center gap-3">
+            <h5 class="mb-0">Photo Gallery</h5>
+            <a asp-action="Index"
+               asp-route-eventId="@Model.EventId"
+               class="btn btn-sm btn-outline-secondary">← Back to Memories</a>
+        </div>
+
+        @if (Model.GalleryPhotos.Count == 0)
+        {
+            <p class="text-muted">No photos yet.</p>
+        }
+
+        <div class="row g-2">
+            @foreach (var photo in Model.GalleryPhotos)
+            {
+                <div class="col-6 col-md-4 col-lg-3">
+                    <img src="@photo" class="img-fluid rounded"
+                         style="height:150px; width:100%; object-fit:cover" alt="gallery photo" />
+                </div>
+            }
+        </div>
+    }
+</div>

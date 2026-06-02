@@ -1,0 +1,113 @@
+@model ChatAndEvents.Web.Models.QuestApprovalViewModel
+
+@{
+    ViewData["Title"] = "Quest Approval";
+}
+
+<div class="quest-approval-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Quest Approval</h1>
+            <p class="text-muted mb-0">@Model.QuestAdmin.EventName</p>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="EventDetail" asp-action="Index" asp-route-eventId="@Model.QuestAdmin.EventId">Back to Event</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">@Model.SuccessMessage</div>
+    }
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-5">
+            <partial name="_QuestAdminControl" model="Model.QuestAdmin" />
+        </div>
+
+        <div class="col-12 col-xl-7">
+            <div class="card">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                        <div>
+                            <h2 class="h4 mb-1">Review Submissions</h2>
+                            <p class="text-muted mb-0">
+                                @(Model.SelectedQuest?.Name ?? "Select a quest from the left side.")
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (Model.SelectedQuest == null)
+                    {
+                        <div class="alert alert-info mb-0">Choose a quest to see pending submissions.</div>
+                    }
+                    else if (Model.Submissions.Count == 0)
+                    {
+                        <div class="alert alert-info mb-0">No pending submissions for this quest.</div>
+                    }
+                    else
+                    {
+                        <div class="submission-list">
+                            @foreach (var submission in Model.Submissions)
+                            {
+                                var canPreviewImage = !string.IsNullOrWhiteSpace(submission.Proof?.PhotoPath) &&
+                                    (submission.Proof.PhotoPath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                                     submission.Proof.PhotoPath.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+                                     submission.Proof.PhotoPath.StartsWith("/"));
+
+                                <div class="submission-card">
+                                    <div class="d-flex justify-content-between align-items-start gap-3">
+                                        <div>
+                                            <div class="fw-semibold">@(submission.Proof?.Author?.Name ?? "Unknown author")</div>
+                                            <div class="text-muted small">Memory ID: @submission.MemoryId</div>
+                                        </div>
+                                        <span class="badge text-bg-warning">Pending</span>
+                                    </div>
+
+                                    @if (canPreviewImage)
+                                    {
+                                        <img class="submission-image" src="@submission.Proof!.PhotoPath" alt="Quest proof" />
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(submission.Proof?.PhotoPath))
+                                    {
+                                        <div class="small">
+                                            Proof photo: <code>@submission.Proof.PhotoPath</code>
+                                        </div>
+                                    }
+
+                                    <p class="mb-0">@(string.IsNullOrWhiteSpace(submission.Proof?.Text) ? "No description provided." : submission.Proof.Text)</p>
+
+                                    <div class="d-flex flex-wrap gap-2 pt-3">
+                                        <form asp-action="Approve" method="post">
+                                            <input type="hidden" name="eventId" value="@Model.QuestAdmin.EventId" />
+                                            <input type="hidden" name="selectedQuestId" value="@Model.SelectedQuest.Id" />
+                                            <input type="hidden" name="memoryId" value="@submission.MemoryId" />
+                                            <button type="submit" class="btn btn-primary">Approve</button>
+                                        </form>
+
+                                        <form asp-action="Deny" method="post">
+                                            <input type="hidden" name="eventId" value="@Model.QuestAdmin.EventId" />
+                                            <input type="hidden" name="selectedQuestId" value="@Model.SelectedQuest.Id" />
+                                            <input type="hidden" name="memoryId" value="@submission.MemoryId" />
+                                            <button type="submit" class="btn btn-outline-secondary">Deny</button>
+                                        </form>
+
+                                        <form asp-action="DeleteSubmission" method="post">
+                                            <input type="hidden" name="eventId" value="@Model.QuestAdmin.EventId" />
+                                            <input type="hidden" name="selectedQuestId" value="@Model.SelectedQuest.Id" />
+                                            <input type="hidden" name="memoryId" value="@submission.MemoryId" />
+                                            <button type="submit" class="btn btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

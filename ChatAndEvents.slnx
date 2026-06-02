@@ -1,0 +1,40 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ChatAndEvents.API/ChatAndEvents.API.AppHost/ChatAndEvents.API.AppHost.csproj" Id="becec2c7-1765-4a87-b7a5-a67b10b4d5be" />
+  <Project Path="ChatAndEvents.API/ChatAndEvents.API.Server/ChatAndEvents.API.Server.csproj">
+    <BuildDependency Project="Events_GSS.Data/ChatAndEvents.Data.csproj" />
+  </Project>
+  <Project Path="ChatAndEvents.Web/ChatAndEvents.Web.csproj">
+    <Build Solution="Debug|ARM64" Project="false" />
+    <Build Solution="Debug|x86" Project="false" />
+  </Project>
+  <Project Path="ChatModule.Tests/ChatModule.Tests.csproj">
+    <Platform Project="x64" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="ChatModule/ChatModule.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Deploy />
+  </Project>
+  <Project Path="Events_GSS.Data/ChatAndEvents.Data.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="Events_GSS.Test/Events_GSS.Test.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="Events_GSS/Events_GSS.csproj">
+    <Platform Solution="*|ARM64" Project="arm64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Deploy Solution="*|ARM64" />
+    <Deploy Solution="*|x86" />
+    <Deploy Solution="Release|x64" />
+  </Project>
+</Solution>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <NoWarn>$(NoWarn);SA*</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Events_GSS.Data\ChatAndEvents.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ChatModule\src\HttpService\AttendedEventHttpService.cs" Link="ExternalServices\AttendedEventHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\EventHttpService.cs" Link="ExternalServices\EventHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\EventStatisticsHttpService.cs" Link="ExternalServices\EventStatisticsHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\MemberPanelHttpService.cs" Link="ExternalServices\MemberPanelHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\ModerationHttpService.cs" Link="ExternalServices\ModerationHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\QuestApprovalHttpService.cs" Link="ExternalServices\QuestApprovalHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\QuestHttpService.cs" Link="ExternalServices\QuestHttpService.cs" />
+    <Compile Include="..\ChatModule\src\HttpService\SearchHttpService.cs" Link="ExternalServices\SearchHttpService.cs" />
+  </ItemGroup>
+
+</Project>

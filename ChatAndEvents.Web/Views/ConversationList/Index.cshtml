@@ -1,0 +1,72 @@
+@model ChatAndEvents.Web.Models.ConversationListViewModel
+
+<div class="container mt-4">
+    <h2>Conversations</h2>
+    <div class="d-flex gap-2 mb-3">
+        <a asp-controller="ConversationList" asp-action="CreateDM" class="btn btn-primary">
+            + New DM
+        </a>
+        <a asp-controller="Group" asp-action="Create" class="btn btn-success">
+            + Create Group
+        </a>
+    </div>
+    <form asp-action="Index" method="get" class="mb-3 d-flex">
+        <input type="hidden" name="activeTab" value="@Model.ActiveTab" />
+        <input name="searchQuery" value="@Model.SearchQuery" class="form-control me-2" placeholder="Search conversations..." />
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+    </form>
+
+    <ul class="nav nav-tabs mb-3">
+        @foreach (var tab in new[] { 
+            ConversationListViewModel.AllTab, 
+            ConversationListViewModel.DirectMessagesTab, 
+            ConversationListViewModel.GroupsTab, 
+            ConversationListViewModel.FavoritesTab, 
+            ConversationListViewModel.UnreadTab 
+        })
+        {
+            <li class="nav-item">
+                <a class="nav-link @(Model.ActiveTab == tab ? "active" : "")" 
+                   asp-action="Index" 
+                   asp-route-activeTab="@tab">
+                    @tab
+                </a>
+            </li>
+        }
+    </ul>
+
+    @if (Model.Conversations.Count == 0)
+    {
+        <div class="alert alert-info">
+            No conversations found.
+        </div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var conv in Model.Conversations)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">@(conv.Title ?? "Direct Message")</h5>
+                        <small>Type: @conv.Type</small>
+                    </div>
+                    <div>
+                        <form asp-action="ToggleFavourite" method="post" style="display:inline;">
+                            <input type="hidden" name="conversationId" value="@conv.Id" />
+                            <input type="hidden" name="currentTab" value="@Model.ActiveTab" />
+                            <input type="hidden" name="currentSearch" value="@Model.SearchQuery" />
+                            <button type="submit" class="btn btn-sm btn-outline-warning">
+                                ⭐ Favourite
+                            </button>
+                        </form>
+                        
+                        <a href="/Chat/Index?conversationId=@conv.Id&currentUserId=11111111-1111-1111-1111-111111111111" class="btn btn-sm btn-primary">
+                            Open Chat
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,93 @@
+﻿@model (List<ChatAndEvents.Data.EventsData.Models.AttendedEvent> Events, string Search, int? CategoryId, string Sort, string Mode)
+
+@foreach (var ae in Model.Events)
+{
+    var isUpcoming = ae.Event?.StartDateTime > DateTime.Now && ae.Event.StartDateTime <= DateTime.Now.AddDays(7);
+
+    <div class="card mb-2 @(Model.Mode == "Archived" ? "opacity-75" : "")">
+        <div class="card-body py-3">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="fw-semibold">@ae.Event?.Name</span>
+                        @if (isUpcoming)
+                        {
+                            <span class="badge" style="background-color:#FF8C00">Soon</span>
+                        }
+                        @if (ae.IsFavourite && Model.Mode == "Attending")
+                        {
+                            <span>⭐</span>
+                        }
+                        @if (ae.UnreadAnnouncementCount > 0)
+                        {
+                            <span class="badge rounded-pill bg-primary">@ae.UnreadAnnouncementCount</span>
+                        }
+                    </div>
+                    <div class="d-flex gap-3 text-muted small">
+                        @if (ae.Event?.Category != null)
+                        {
+                            <span>@ae.Event.Category.Title</span>
+                        }
+                        @if (Model.Mode != "Archived")
+                        {
+                            <span>@ae.Event?.StartDateTime.ToString("dd MMM yyyy") → @ae.Event?.EndDateTime.ToString("dd MMM yyyy")</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-shrink-0">
+                    @if (Model.Mode == "Attending")
+                    {
+                        <form method="post" asp-action="SetFavourite">
+                            <input type="hidden" name="eventId" value="@ae.Event?.EventId" />
+                            <input type="hidden" name="isFavourite" value="@(ae.IsFavourite ? "false" : "true")" />
+                            <input type="hidden" name="search" value="@Model.Search" />
+                            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                            <input type="hidden" name="sort" value="@Model.Sort" />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">@(ae.IsFavourite ? "Unfavourite" : "Favourite")</button>
+                        </form>
+                        <form method="post" asp-action="SetArchived">
+                            <input type="hidden" name="eventId" value="@ae.Event?.EventId" />
+                            <input type="hidden" name="isArchived" value="@(ae.IsArchived ? "false" : "true")" />
+                            <input type="hidden" name="search" value="@Model.Search" />
+                            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                            <input type="hidden" name="sort" value="@Model.Sort" />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Archive</button>
+                        </form>
+                        <form method="post" asp-action="Leave">
+                            <input type="hidden" name="eventId" value="@ae.Event?.EventId" />
+                            <input type="hidden" name="search" value="@Model.Search" />
+                            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                            <input type="hidden" name="sort" value="@Model.Sort" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Leave</button>
+                        </form>
+                    }
+                    else if (Model.Mode == "Archived")
+                    {
+                        <form method="post" asp-action="SetArchived">
+                            <input type="hidden" name="eventId" value="@ae.Event?.EventId" />
+                            <input type="hidden" name="isArchived" value="false" />
+                            <input type="hidden" name="search" value="@Model.Search" />
+                            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                            <input type="hidden" name="sort" value="@Model.Sort" />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">Unarchive</button>
+                        </form>
+                    }
+                    else if (Model.Mode == "Favourites")
+                    {
+                        <form method="post" asp-action="SetFavourite">
+                            <input type="hidden" name="eventId" value="@ae.Event?.EventId" />
+                            <input type="hidden" name="isFavourite" value="false" />
+                            <input type="hidden" name="search" value="@Model.Search" />
+                            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                            <input type="hidden" name="sort" value="@Model.Sort" />
+                            <button type="submit" class="btn btn-sm btn-outline-warning">Unfavourite</button>
+                        </form>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

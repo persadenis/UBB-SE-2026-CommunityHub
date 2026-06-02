@@ -1,0 +1,66 @@
+@model ChatAndEvents.Web.Models.FriendRequestsViewModel
+
+@{
+    ViewData["Title"] = "Friend Requests";
+}
+
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+        <div>
+            <h2 class="mb-1">Friend Requests</h2>
+            <p class="text-muted mb-0">Review incoming requests.</p>
+        </div>
+        <a asp-controller="FriendList" asp-action="Index" class="btn btn-outline-secondary align-self-start">Back to Friends</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.RequestActionMessage))
+    {
+        <div class="alert alert-info">@Model.RequestActionMessage</div>
+    }
+
+    @if (!Model.HasIncomingRequests)
+    {
+        <div class="alert alert-secondary">
+            No pending friend requests.
+        </div>
+    }
+    else
+    {
+        <div class="list-group">
+            @foreach (var request in Model.IncomingRequests)
+            {
+                <div class="list-group-item">
+                    <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="friend-avatar">
+                                @if (request.HasAvatar)
+                                {
+                                    <img src="@request.AvatarUrl" alt="@request.Username avatar" />
+                                }
+                                else
+                                {
+                                    <span>@request.AvatarInitial</span>
+                                }
+                            </div>
+                            <div>
+                                <h5 class="mb-1">@request.Username</h5>
+                                <div class="text-muted small">@request.StatusLabel</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <a asp-controller="Profile" asp-action="Index" asp-route-userId="@request.Id" class="btn btn-sm btn-outline-secondary">Profile</a>
+                            <form asp-action="Accept" method="post">
+                                <input type="hidden" name="requesterId" value="@request.Id" />
+                                <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                            </form>
+                            <form asp-action="Decline" method="post">
+                                <input type="hidden" name="requesterId" value="@request.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

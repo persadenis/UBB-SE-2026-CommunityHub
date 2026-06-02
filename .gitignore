@@ -1,0 +1,16 @@
+.vs/
+**/.vs/
+bin/
+obj/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.db
+*.mdf
+*.ldf
+.runlogs/
+**/.runlogs/
+ChatAndEvents.Web/wwwroot/uploads/matchmaking/*
+!ChatAndEvents.Web/wwwroot/uploads/matchmaking/demo/
+!ChatAndEvents.Web/wwwroot/uploads/matchmaking/demo/*

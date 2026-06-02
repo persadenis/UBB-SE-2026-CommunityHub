@@ -1,0 +1,70 @@
+﻿@model ChatAndEvents.Web.Models.NotificationViewModel
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="hub-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Notifications</h1>
+            <p class="text-muted mb-0">Updates from events, communities, chat, friends, and matchmaking.</p>
+        </div>
+        <a asp-controller="MainWindow" asp-action="Index" class="btn btn-outline-secondary">Dashboard</a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model.Notifications == null || !Model.Notifications.Any())
+    {
+        <div class="hub-panel">
+            <h3>No notifications yet.</h3>
+        </div>
+    }
+    else
+    {
+        <div class="post-list">
+            @foreach (var notif in Model.Notifications)
+            {
+                <div class="post-card d-flex flex-column flex-md-row justify-content-between gap-3">
+                    <div>
+                        <div class="d-flex flex-wrap gap-2 align-items-center mb-1">
+                            <h4 class="mb-0">@notif.Title</h4>
+                            <span class="badge text-bg-secondary">@notif.SourceFeature</span>
+                            @if (!notif.IsRead)
+                            {
+                                <span class="badge text-bg-primary">New</span>
+                            }
+                        </div>
+                        <p>@notif.Description</p>
+                        <small>@notif.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy h:mm tt")</small>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-start">
+                        @if (!notif.IsRead)
+                        {
+                            <form asp-controller="Notification" asp-action="MarkRead" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@notif.Id" />
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Mark read</button>
+                            </form>
+                        }
+                        <form asp-controller="Notification" asp-action="Delete" method="post" onsubmit="return confirm('Delete this notification?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@notif.Id" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

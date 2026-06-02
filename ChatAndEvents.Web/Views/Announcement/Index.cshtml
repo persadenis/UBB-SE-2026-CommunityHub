@@ -1,0 +1,130 @@
+@model ChatAndEvents.Web.Models.AnnouncementViewModel
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1">Announcements</h2>
+            <div class="text-muted">Current user: @Model.CurrentUserName</div>
+        </div>
+        <span class="badge bg-secondary fs-6">Unread: @Model.UnreadCount</span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.IsEventAdmin)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                @(Model.IsEditing ? $"Editing announcement #{Model.EditingAnnouncement?.Model.Id}" : "Post announcement")
+            </div>
+            <div class="card-body">
+                <form asp-action="Submit" method="post">
+                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                    <input type="hidden" name="announcementId" value="@Model.EditingAnnouncement?.Model.Id" />
+                    <div class="mb-3">
+                        <textarea name="newMessage" class="form-control" rows="4" placeholder="Write an announcement...">@Model.NewMessage</textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">@Model.CreateButtonText</button>
+                        @if (Model.IsEditing)
+                        {
+                            <a asp-action="Index" asp-route-eventId="@Model.EventId" class="btn btn-outline-secondary">Cancel</a>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (Model.Announcements.Count == 0)
+    {
+        <div class="alert alert-info">No announcements yet.</div>
+    }
+    else
+    {
+        <div class="d-grid gap-3">
+            @foreach (var announcement in Model.Announcements)
+            {
+                <div class="card @(announcement.Model.IsPinned ? "border-warning" : "")">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    @if (announcement.IsUnread)
+                                    {
+                                        <span class="badge bg-primary">Unread</span>
+                                    }
+                                    @if (announcement.Model.IsPinned)
+                                    {
+                                        <span class="badge bg-warning text-dark">Pinned</span>
+                                    }
+                                    @if (announcement.Model.IsEdited)
+                                    {
+                                        <span class="badge bg-secondary">Edited</span>
+                                    }
+                                </div>
+                                <h5 class="card-title mb-1">@announcement.PreviewText</h5>
+                                <div class="text-muted small mb-2">
+                                    <span>@announcement.AuthorName</span>
+                                    <span class="mx-2">•</span>
+                                    <span>@announcement.DateText</span>
+                                </div>
+                                <p class="card-text mb-3" style="white-space: pre-wrap;">@announcement.Model.Message</p>
+                            </div>
+
+                            @if (Model.IsEventAdmin)
+                            {
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a asp-action="Index"
+                                       asp-route-eventId="@Model.EventId"
+                                       asp-route-editAnnouncementId="@announcement.Model.Id"
+                                       class="btn btn-sm btn-outline-primary">Edit</a>
+
+                                    <form asp-action="Delete" method="post">
+                                        <input type="hidden" name="eventId" value="@Model.EventId" />
+                                        <input type="hidden" name="announcementId" value="@announcement.Model.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+
+                                    <form asp-action="Pin" method="post">
+                                        <input type="hidden" name="eventId" value="@Model.EventId" />
+                                        <input type="hidden" name="announcementId" value="@announcement.Model.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-warning">Pin</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+
+                        @if (announcement.ReactionGroups.Count > 0)
+                        {
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                @foreach (var reaction in announcement.ReactionGroups)
+                                {
+                                    <span class="badge @(reaction.CurrentUserReacted ? "bg-primary" : "bg-secondary")">
+                                        @reaction.Emoji @reaction.Count
+                                    </span>
+                                }
+                            </div>
+                        }
+
+                        <div class="d-flex flex-wrap gap-1 mt-3">
+                            <form asp-action="React" method="post" class="d-flex flex-wrap gap-1">
+                                <input type="hidden" name="eventId" value="@Model.EventId" />
+                                <input type="hidden" name="announcementId" value="@announcement.Model.Id" />
+                                <button type="submit" name="emoji" value="👍" class="btn btn-sm btn-outline-secondary">👍</button>
+                                <button type="submit" name="emoji" value="❤️" class="btn btn-sm btn-outline-secondary">❤️</button>
+                                <button type="submit" name="emoji" value="😂" class="btn btn-sm btn-outline-secondary">😂</button>
+                                <button type="submit" name="emoji" value="😮" class="btn btn-sm btn-outline-secondary">😮</button>
+                                <button type="submit" name="emoji" value="😢" class="btn btn-sm btn-outline-secondary">😢</button>
+                                <button type="submit" name="emoji" value="🔥" class="btn btn-sm btn-outline-secondary">🔥</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

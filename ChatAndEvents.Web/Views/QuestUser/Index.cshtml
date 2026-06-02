@@ -1,0 +1,143 @@
+@model ChatAndEvents.Web.Models.QuestUserViewModel
+
+@{
+    ViewData["Title"] = "Quests";
+}
+
+<div class="quest-user-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Quests</h1>
+            <p class="text-muted mb-0">@Model.EventName</p>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="EventDetail" asp-action="Index" asp-route-eventId="@Model.EventId">Back to Event</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">@Model.SuccessMessage</div>
+    }
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="text-muted">@Model.StatusText</div>
+
+        <form asp-action="Index" method="get" class="d-flex gap-2 align-items-center">
+            <input type="hidden" name="eventId" value="@Model.EventId" />
+            <label class="form-label mb-0" for="filter">Filter</label>
+            <select class="form-select" id="filter" name="filter" onchange="this.form.submit()">
+                @if (Model.Filter == ChatAndEvents.Web.Models.QuestUserFilters.All)
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.All" selected>All</option>
+                }
+                else
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.All">All</option>
+                }
+
+                @if (Model.Filter == ChatAndEvents.Web.Models.QuestUserFilters.Submitted)
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.Submitted" selected>Submitted</option>
+                }
+                else
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.Submitted">Submitted</option>
+                }
+
+                @if (Model.Filter == ChatAndEvents.Web.Models.QuestUserFilters.Completed)
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.Completed" selected>Completed</option>
+                }
+                else
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.Completed">Completed</option>
+                }
+
+                @if (Model.Filter == ChatAndEvents.Web.Models.QuestUserFilters.Incomplete)
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.Incomplete" selected>Incomplete</option>
+                }
+                else
+                {
+                    <option value="@ChatAndEvents.Web.Models.QuestUserFilters.Incomplete">Incomplete</option>
+                }
+            </select>
+        </form>
+    </div>
+
+    @if (Model.Quests.Count == 0)
+    {
+        <div class="alert alert-info">No quests match the current filter.</div>
+    }
+    else
+    {
+        <div class="quest-user-list">
+            @foreach (var quest in Model.Quests)
+            {
+                <div class="quest-user-card">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                        <div>
+                            <h2 class="h5 mb-1">@quest.Name</h2>
+                            <div class="text-muted mb-2">@quest.Description</div>
+                            <div class="small">
+                                <span>@quest.DifficultyStars</span>
+                                <span class="ms-3">Prerequisite: @quest.PrerequisiteHint</span>
+                                <span class="ms-3">Status: @quest.StatusLabel</span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (quest.CanSubmit)
+                            {
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#submit-proof-@quest.Quest.Id">
+                                    Submit
+                                </button>
+                            }
+
+                            @if (quest.CanDelete)
+                            {
+                                <form asp-action="DeleteSubmission" method="post">
+                                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                                    <input type="hidden" name="questId" value="@quest.Quest.Id" />
+                                    <input type="hidden" name="filter" value="@Model.Filter" />
+                                    <button type="submit" class="btn btn-outline-danger">Delete Submission</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+
+                    @if (quest.CanSubmit)
+                    {
+                        <div class="collapse mt-3" id="submit-proof-@quest.Quest.Id">
+                            <div class="submit-proof-box">
+                                <form asp-action="SubmitProof" method="post" class="row g-3">
+                                    <input type="hidden" name="eventId" value="@Model.EventId" />
+                                    <input type="hidden" name="questId" value="@quest.Quest.Id" />
+                                    <input type="hidden" name="filter" value="@Model.Filter" />
+
+                                    <div class="col-12">
+                                        <label class="form-label" for="photoPath-@quest.Quest.Id">Photo Path or URL</label>
+                                        <input class="form-control" id="photoPath-@quest.Quest.Id" name="photoPath" placeholder="Optional" />
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label" for="text-@quest.Quest.Id">Description</label>
+                                        <textarea class="form-control" id="text-@quest.Quest.Id" name="text" rows="3" placeholder="Explain your proof"></textarea>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">Send Proof</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

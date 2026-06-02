@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Community Hub</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ChatAndEvents.Web.styles.css" asp-append-version="true" />
+</head>
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var userName = User.Identity?.Name ?? "Guest";
+}
+<body class="wp-body @(isAuthenticated ? "wp-body-authenticated" : "wp-body-guest")">
+    @if (isAuthenticated)
+    {
+        <header class="wp-header">
+            <a class="wp-logo-link" asp-controller="MainWindow" asp-action="Index" aria-label="Community Hub home">
+                <img src="~/images/WPLogo.png" alt="Weaponized Penguins" class="wp-logo" />
+            </a>
+
+            <form class="wp-search" asp-controller="Communities" asp-action="Index" method="get">
+                <input name="query" placeholder="Search communities..." autocomplete="off" />
+                <button type="submit" aria-label="Search communities">Search</button>
+            </form>
+
+            <div class="wp-user-strip">
+                <span class="wp-token">0 Tokens</span>
+                <span class="wp-user">@userName</span>
+            </div>
+        </header>
+
+        <div class="wp-main-layout">
+            <aside class="wp-left-rail">
+                <nav class="wp-nav-list">
+                    <a asp-controller="MainWindow" asp-action="Index">Home</a>
+                    <a asp-controller="Communities" asp-action="Index">Discovery</a>
+                    <a asp-controller="Communities" asp-action="Index" asp-fragment="start-community">Start Community</a>
+                </nav>
+
+                <div class="wp-rail-title">SOCIAL</div>
+                <nav class="wp-mini-list">
+                    <a asp-controller="ConversationList" asp-action="Index">Conversations</a>
+                    <a asp-controller="FriendList" asp-action="Index">Friends</a>
+                    <a asp-controller="Profile" asp-action="Index">Profile</a>
+                </nav>
+
+                <div class="wp-rail-title">ACTIVITIES</div>
+                <nav class="wp-mini-list">
+                    <a asp-controller="EventListing" asp-action="Index">Events</a>
+                    <a asp-controller="MyEvents" asp-action="Index">My Events</a>
+                    <a asp-controller="Reputation" asp-action="Index">Reputation &amp; Quests</a>
+                    <a asp-controller="Matchmaking" asp-action="Index">Matchmaking</a>
+                </nav>
+
+                <form asp-controller="Auth" asp-action="Logout" method="post" class="wp-logout-form">
+                    @Html.AntiForgeryToken()
+                    <button type="submit">Logout</button>
+                </form>
+            </aside>
+
+            <main role="main" class="wp-content-frame">
+                @RenderBody()
+            </main>
+
+            <aside class="wp-right-rail">
+                <div class="wp-right-title">Notifications</div>
+                <a class="wp-notification-card" asp-controller="Notification" asp-action="Index">
+                    <strong>Open notification center</strong>
+                    <span>See updates from communities, friends, events, and matchmaking.</span>
+                </a>
+                <a class="wp-notification-card" asp-controller="FriendRequests" asp-action="Index">
+                    <strong>Friend requests</strong>
+                    <span>Review pending social requests.</span>
+                </a>
+                <a class="wp-notification-card" asp-controller="Communities" asp-action="Index">
+                    <strong>Community discovery</strong>
+                    <span>Find groups that match your interests.</span>
+                </a>
+            </aside>
+        </div>
+    }
+    else
+    {
+        <main role="main" class="wp-auth-main">
+            @RenderBody()
+        </main>
+    }
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

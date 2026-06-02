@@ -1,0 +1,64 @@
+@model ChatAndEvents.Web.Models.CreateEventViewModel
+
+<div class="card">
+    <div class="card-body p-4">
+        <h2 class="h4 mb-1">Step 2 of 3</h2>
+        <p class="text-muted mb-4">Optional details, category, and banner.</p>
+
+        <form asp-action="GoToStep3" method="post" class="row g-3">
+            <div class="col-12">
+                <label class="form-label" asp-for="Description">Description</label>
+                <textarea class="form-control" asp-for="Description" rows="5"></textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" asp-for="MaximumPeopleText">Maximum Attendees</label>
+                <input class="form-control" asp-for="MaximumPeopleText" inputmode="numeric" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" asp-for="SelectedCategoryId">Category</label>
+                <select class="form-select" asp-for="SelectedCategoryId">
+                    <option value="">Select a category</option>
+                    @foreach (var category in Model.AvailableCategories)
+                    {
+                        <option value="@category.CategoryId">@category.Title</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" asp-for="EventBannerPath">Banner Image Path or URL</label>
+                <input class="form-control" asp-for="EventBannerPath" placeholder="https://... or local path" />
+            </div>
+
+            @if (Model.HasBannerImage)
+            {
+                <div class="col-12">
+                    <div class="banner-preview">
+                        <div class="banner-preview-label">Banner preview path</div>
+                        <code>@Model.EventBannerPath</code>
+                    </div>
+                </div>
+            }
+
+            <div class="col-12 d-flex justify-content-between align-items-center pt-2">
+                <button type="submit" class="btn btn-primary">Next</button>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between mt-3">
+            <form asp-action="GoBackToStep1" method="post">
+                <input type="hidden" asp-for="Description" />
+                <input type="hidden" asp-for="MaximumPeopleText" />
+                <input type="hidden" asp-for="EventBannerPath" />
+                <input type="hidden" asp-for="SelectedCategoryId" />
+                <button type="submit" class="btn btn-outline-secondary">Back</button>
+            </form>
+
+            <form asp-action="Cancel" method="post">
+                <button type="submit" class="btn btn-outline-secondary">Cancel</button>
+            </form>
+        </div>
+    </div>
+</div>

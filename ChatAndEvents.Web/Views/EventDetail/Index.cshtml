@@ -1,0 +1,75 @@
+@model ChatAndEvents.Web.Models.EventDetailViewModel
+
+@{
+    ViewData["Title"] = Model.SelectedEvent.Name;
+}
+
+<div class="event-detail">
+    <div class="detail-header">
+        <a class="btn btn-outline-secondary" asp-controller="EventListing" asp-action="Index">Back</a>
+        <div class="detail-heading">
+            <h1>@Model.SelectedEvent.Name</h1>
+            <p>@Model.SelectedEvent.StartDateTime.ToString("MMM dd, yyyy HH:mm") - @Model.SelectedEvent.Location</p>
+        </div>
+        <div class="detail-actions">
+            @if (Model.CanShowStatistics)
+            {
+                <a class="btn btn-outline-primary" asp-controller="EventStatistics" asp-action="Index" asp-route-eventId="@Model.SelectedEvent.EventId">Statistics</a>
+            }
+            else
+            {
+                <form asp-action="ToggleAttendance" method="post">
+                    <input type="hidden" name="eventId" value="@Model.SelectedEvent.EventId" />
+                    <input type="hidden" name="isEnrolled" value="@Model.IsEnrolled" />
+                    <button class="btn btn-primary" type="submit">@Model.JoinLeaveButtonText</button>
+                </form>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">@Model.SuccessMessage</div>
+    }
+
+    <section class="detail-summary">
+        <div>
+            <h2>About</h2>
+            <p>@(string.IsNullOrWhiteSpace(Model.SelectedEvent.Description) ? "No description provided." : Model.SelectedEvent.Description)</p>
+        </div>
+        <dl>
+            <dt>Participants</dt>
+            <dd>@Model.SelectedEvent.EnrolledCount / @(Model.SelectedEvent.MaximumPeople?.ToString() ?? "Unlimited")</dd>
+            <dt>Visibility</dt>
+            <dd>@(Model.SelectedEvent.IsPublic ? "Public" : "Private")</dd>
+            <dt>Ends</dt>
+            <dd>@Model.SelectedEvent.EndDateTime.ToString("MMM dd, yyyy HH:mm")</dd>
+        </dl>
+    </section>
+
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Announcement" asp-action="Index" asp-route-eventId="@Model.SelectedEvent.EventId">Announcements</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Discussion" asp-action="Index" asp-route-eventId="@Model.SelectedEvent.EventId">Discussions</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="Memory" asp-action="Index" asp-route-eventId="@Model.SelectedEvent.EventId">Memories</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-controller="QuestUser" asp-action="Index" asp-route-eventId="@Model.SelectedEvent.EventId">Quests</a>
+        </li>
+        @if (Model.IsAdmin)
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="QuestApproval" asp-action="Index" asp-route-eventId="@Model.SelectedEvent.EventId">Quest Review</a>
+            </li>
+        }
+    </ul>
+</div>

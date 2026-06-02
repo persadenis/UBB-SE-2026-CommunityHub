@@ -1,0 +1,206 @@
+@model ChatAndEvents.Web.Models.MemberPanelViewModel
+
+@{
+    ViewData["Title"] = "Members";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1">Members</h2>
+            <div class="text-muted small">Conversation: @Model.ConversationId</div>
+        </div>
+        <a class="btn btn-outline-secondary"
+           asp-controller="Chat"
+           asp-action="Index"
+           asp-route-conversationId="@Model.ConversationId"
+           asp-route-currentUserId="@Model.CurrentUserId">Back to chat</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">@Model.SuccessMessage</div>
+    }
+
+    @if (Model.IsAdmin)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Add Member</h5>
+                <form asp-action="Index" method="get" class="row g-2 mb-3">
+                    <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                    <div class="col-md-9">
+                        <input name="addMemberQuery"
+                               value="@Model.AddMemberQuery"
+                               class="form-control"
+                               placeholder="Search by username" />
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        <button type="submit" class="btn btn-outline-primary">Search</button>
+                    </div>
+                </form>
+
+                @if (Model.AddMemberResults.Count > 0)
+                {
+                    <div class="list-group">
+                        @foreach (var user in Model.AddMemberResults)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@user.Username</strong>
+                                    <span class="text-muted small d-block">@user.Email</span>
+                                </div>
+                                <form asp-action="AddMember" method="post">
+                                    <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                    <input type="hidden" name="newUserId" value="@user.Id" />
+                                    <input type="hidden" name="addMemberQuery" value="@Model.AddMemberQuery" />
+                                    <button type="submit" class="btn btn-sm btn-primary">Add</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.AddMemberQuery))
+                {
+                    <div class="text-muted small">No users found.</div>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <h5 class="mb-2">Active Members</h5>
+            @if (Model.Members.Count == 0)
+            {
+                <div class="alert alert-info">No active members found.</div>
+            }
+            else
+            {
+                <div class="list-group">
+                    @foreach (var member in Model.Members)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between gap-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
+                                         style="width:40px;height:40px;">
+                                        @member.Username.Substring(0, 1).ToUpperInvariant()
+                                    </div>
+                                    <div>
+                                        <strong>@member.Username</strong>
+                                        <div class="small text-muted">
+                                            <span class="badge @member.StatusCssClass">@member.StatusLabel</span>
+                                            <span class="ms-1">@member.RoleLabel</span>
+                                            @if (!string.IsNullOrWhiteSpace(member.TimeoutRemainingLabel))
+                                            {
+                                                <span class="ms-1 text-warning">@member.TimeoutRemainingLabel</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                                    <a class="btn btn-sm btn-outline-secondary"
+                                       asp-controller="Profile"
+                                       asp-action="Index"
+                                       asp-route-userId="@member.UserId">Profile</a>
+
+                                    @if (Model.IsAdmin)
+                                    {
+                                        @if (member.IsMemberRole)
+                                        {
+                                            <form asp-action="Promote" method="post">
+                                                <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                                <input type="hidden" name="userId" value="@member.UserId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-primary">Promote</button>
+                                            </form>
+                                        }
+
+                                        @if (member.IsAdminRole && member.UserId != Model.CurrentUserId)
+                                        {
+                                            <form asp-action="Demote" method="post">
+                                                <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                                <input type="hidden" name="userId" value="@member.UserId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">Demote</button>
+                                            </form>
+                                        }
+
+                                        @if (member.IsMemberRole)
+                                        {
+                                            <form asp-action="Timeout" method="post" class="d-flex gap-1">
+                                                <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                                <input type="hidden" name="userId" value="@member.UserId" />
+                                                <input type="number"
+                                                       name="durationMinutes"
+                                                       value="10"
+                                                       min="1"
+                                                       max="1440"
+                                                       class="form-control form-control-sm"
+                                                       style="width:76px" />
+                                                <button type="submit" class="btn btn-sm btn-outline-warning">Timeout</button>
+                                            </form>
+                                        }
+
+                                        @if (member.HasTimeout)
+                                        {
+                                            <form asp-action="RemoveTimeout" method="post">
+                                                <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                                <input type="hidden" name="userId" value="@member.UserId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-warning">Clear timeout</button>
+                                            </form>
+                                        }
+
+                                        @if (member.UserId != Model.CurrentUserId)
+                                        {
+                                            <form asp-action="Ban" method="post">
+                                                <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                                <input type="hidden" name="userId" value="@member.UserId" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Ban</button>
+                                            </form>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        @if (Model.IsAdmin)
+        {
+            <div class="col-lg-4">
+                <h5 class="mb-2">Banned Members</h5>
+                @if (Model.BannedMembers.Count == 0)
+                {
+                    <div class="alert alert-light border">No banned members.</div>
+                }
+                else
+                {
+                    <div class="list-group">
+                        @foreach (var member in Model.BannedMembers)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@member.Username</strong>
+                                    <div class="small text-muted">@member.RoleLabel</div>
+                                </div>
+                                <form asp-action="Unban" method="post">
+                                    <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+                                    <input type="hidden" name="userId" value="@member.UserId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Unban</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

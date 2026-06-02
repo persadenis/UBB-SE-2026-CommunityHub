@@ -1,0 +1,122 @@
+@model ChatAndEvents.Web.Models.CreateEventViewModel
+
+<div class="card">
+    <div class="card-body p-4">
+        <h2 class="h4 mb-1">Step 3 of 3</h2>
+        <p class="text-muted mb-4">Attach preset quests or add your own custom quests.</p>
+
+        <div class="row g-4">
+            <div class="col-12 col-xl-7">
+                <div class="quest-picker">
+                    <h3 class="h5">Preset Quests</h3>
+
+                    @if (Model.AvailableQuests.Count == 0)
+                    {
+                        <div class="alert alert-info mb-0">No preset quests are available right now.</div>
+                    }
+                    else
+                    {
+                        <div class="quest-picker-list">
+                            @foreach (var quest in Model.AvailableQuests)
+                            {
+                                var isSelected = Model.SelectedQuests.Any(selectedQuest => selectedQuest.PresetQuestId == quest.Id);
+
+                                <div class="quest-picker-item">
+                                    <div>
+                                        <div class="fw-semibold">@quest.Name</div>
+                                        <div class="text-muted small">@quest.Description</div>
+                                        <div class="small mt-2">Difficulty: @quest.Difficulty / 5</div>
+                                    </div>
+
+                                    <form asp-action="ToggleQuest" method="post">
+                                        <input type="hidden" name="questId" value="@quest.Id" />
+                                        <button type="submit" class="btn @(isSelected ? "btn-outline-danger" : "btn-outline-primary")">
+                                            @(isSelected ? "Remove" : "Add")
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-5">
+                <div class="quest-picker">
+                    <h3 class="h5">Add Custom Quest</h3>
+
+                    <form asp-action="AddCustomQuest" method="post" class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" asp-for="CustomQuestName">Quest Name</label>
+                            <input class="form-control" asp-for="CustomQuestName" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" asp-for="CustomQuestDescription">Description</label>
+                            <textarea class="form-control" asp-for="CustomQuestDescription" rows="3"></textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-outline-primary">Add Custom Quest</button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4" />
+
+                    <h3 class="h5">Selected Quests</h3>
+
+                    @if (Model.SelectedQuests.Count == 0)
+                    {
+                        <p class="text-muted mb-0">No quests selected yet.</p>
+                    }
+                    else
+                    {
+                        <div class="selected-quest-list">
+                            @foreach (var quest in Model.SelectedQuests)
+                            {
+                                <div class="selected-quest-item">
+                                    <div>
+                                        <div class="fw-semibold">@quest.Name</div>
+                                        <div class="text-muted small">@quest.Description</div>
+                                        <div class="small mt-2">
+                                            @if (quest.IsCustom)
+                                            {
+                                                <span>Custom quest</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Preset quest</span>
+                                            }
+                                            <span class="ms-2">Difficulty: @quest.Difficulty / 5</span>
+                                        </div>
+                                    </div>
+
+                                    <form asp-action="RemoveQuest" method="post">
+                                        <input type="hidden" name="key" value="@quest.Key" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <form asp-action="GoBackToStep2" method="post">
+                <button type="submit" class="btn btn-outline-secondary">Back</button>
+            </form>
+
+            <div class="d-flex gap-2">
+                <form asp-action="Cancel" method="post">
+                    <button type="submit" class="btn btn-outline-secondary">Cancel</button>
+                </form>
+
+                <form asp-action="Create" method="post">
+                    <button type="submit" class="btn btn-primary">Create Event</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

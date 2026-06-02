@@ -1,0 +1,17 @@
+@model ChatAndEvents.Web.Models.CreateEventViewModel
+
+@{
+    ViewData["Title"] = "Create Event";
+}
+
+<div class="create-event-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Create Event</h1>
+            <p class="text-muted mb-0">Build the event in three steps, just like in the desktop flow.</p>
+        </div>
+        <a class="btn btn-outline-secondary" asp-controller="EventListing" asp-action="Index">Back to Events</a>
+    </div>
+
+    <partial name="_CreateEventControl" model="Model" />
+</div>

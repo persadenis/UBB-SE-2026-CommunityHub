@@ -1,0 +1,86 @@
+@model ChatAndEvents.Web.Models.MainWindowViewModel
+
+@{
+    ViewData["Title"] = "Unified App";
+}
+
+<section class="wp-feed-page">
+    <div class="wp-welcome-card">
+        <div>
+            <span class="wp-kicker">Home feed</span>
+            <h1>Welcome back, @Model.CurrentUsername</h1>
+            <p>Open your communities, chat with friends, browse events, or enter matchmaking from the board shell.</p>
+        </div>
+        <a class="wp-primary-action" asp-controller="Communities" asp-action="Index">Discover Communities</a>
+    </div>
+
+    <div class="wp-post-list">
+        <a class="wp-post-card" asp-controller="Communities" asp-action="Index">
+            <div class="wp-vote-stack">
+                <span>▲</span>
+                <strong>WP</strong>
+                <span>▼</span>
+            </div>
+            <div class="wp-post-body">
+                <div class="wp-post-meta">
+                    <strong>Community Board</strong>
+                    <span>Search and join groups</span>
+                </div>
+                <h2>Communities</h2>
+                <p>Find categories, join communities, and create posts using the board workflow.</p>
+            </div>
+            <div class="wp-comment-badge">Go</div>
+        </a>
+
+        <a class="wp-post-card" asp-controller="EventListing" asp-action="Index">
+            <div class="wp-vote-stack">
+                <span>▲</span>
+                <strong>XP</strong>
+                <span>▼</span>
+            </div>
+            <div class="wp-post-body">
+                <div class="wp-post-meta">
+                    <strong>Activities</strong>
+                    <span>Events and quests</span>
+                </div>
+                <h2>Events</h2>
+                <p>Browse events, manage your schedule, complete quests, and track reputation.</p>
+            </div>
+            <div class="wp-comment-badge">Go</div>
+        </a>
+
+        <a class="wp-post-card" asp-controller="ConversationList" asp-action="Index">
+            <div class="wp-vote-stack">
+                <span>▲</span>
+                <strong>DM</strong>
+                <span>▼</span>
+            </div>
+            <div class="wp-post-body">
+                <div class="wp-post-meta">
+                    <strong>Social</strong>
+                    <span>Friends and messages</span>
+                </div>
+                <h2>Conversations</h2>
+                <p>Open chats, friend requests, and profile tools from the same account.</p>
+            </div>
+            <div class="wp-comment-badge">Go</div>
+        </a>
+
+        <a class="wp-post-card" asp-controller="Matchmaking" asp-action="Index">
+            <div class="wp-vote-stack">
+                <span>▲</span>
+                <strong>♡</strong>
+                <span>▼</span>
+            </div>
+            <div class="wp-post-body">
+                <div class="wp-post-meta">
+                    <strong>Optional mode</strong>
+                    <span>Profile controlled</span>
+                </div>
+                <h2>Matchmaking</h2>
+                <p>Enable matchmaking only when you want to complete dating fields and appear in discovery.</p>
+            </div>
+            <div class="wp-comment-badge">Go</div>
+        </a>
+    </div>
+</section>

@@ -1,0 +1,68 @@
+@model ChatAndEvents.Web.Models.MessageSearchViewModel
+
+@{
+    ViewData["Title"] = "Search Messages";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h2 class="mb-1">Search Messages</h2>
+            <div class="text-muted small">Conversation: @Model.ConversationId</div>
+        </div>
+        <a class="btn btn-outline-secondary"
+           asp-controller="Chat"
+           asp-action="Index"
+           asp-route-conversationId="@Model.ConversationId"
+           asp-route-currentUserId="@Model.CurrentUserId">Back to chat</a>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <form asp-action="Index" method="get" class="row g-2 mb-3">
+        <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+        <div class="col-md-10">
+            <input name="query"
+                   value="@Model.Query"
+                   class="form-control"
+                   placeholder="Search in this conversation" />
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.NoResultsMessage))
+    {
+        <div class="alert alert-info">@Model.NoResultsMessage</div>
+    }
+
+    @if (Model.Results.Count > 0)
+    {
+        <div class="list-group">
+            @foreach (var message in Model.Results)
+            {
+                <div class="list-group-item" id="message-@message.Id">
+                    <div class="d-flex justify-content-between gap-3">
+                        <div>
+                            <div class="mb-1">
+                                <strong>@(message.SenderUsername ?? "Unknown")</strong>
+                                <span class="text-muted small ms-2">@message.CreatedAt.ToString("MMM dd, yyyy HH:mm")</span>
+                            </div>
+                            <div>@(message.Content ?? "[empty message]")</div>
+                        </div>
+                        <a class="btn btn-sm btn-outline-primary align-self-center"
+                           asp-controller="Chat"
+                           asp-action="Index"
+                           asp-route-conversationId="@Model.ConversationId"
+                           asp-route-currentUserId="@Model.CurrentUserId"
+                           asp-route-messageId="@message.Id">Go</a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

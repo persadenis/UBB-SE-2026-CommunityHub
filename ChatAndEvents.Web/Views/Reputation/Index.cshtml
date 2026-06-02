@@ -1,0 +1,82 @@
+@model ChatAndEvents.Web.Models.ReputationViewModel
+
+<div class="container mt-4">
+    <h2 class="mb-4">Reputation</h2>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-5">
+            <div class="card h-100">
+                <div class="card-body text-center py-5">
+                    <div class="text-muted mb-2">@Model.UserName</div>
+                    <div class="display-4 fw-bold">@Model.ReputationPoints</div>
+                    <div class="fs-5 text-muted mb-3">RP</div>
+                    <span class="badge bg-primary fs-6 px-3 py-2">@Model.CurrentTier</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+            <div class="card h-100">
+                <div class="card-header">Tier Thresholds</div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Newcomer</span>
+                            <span class="text-muted">0 RP</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Contributor</span>
+                            <span class="text-muted">50 RP</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Organizer</span>
+                            <span class="text-muted">200 RP</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Community Leader</span>
+                            <span class="text-muted">500 RP</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between">
+                            <span>Event Master</span>
+                            <span class="text-muted">1000 RP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4 class="mb-3">Achievements</h4>
+        @if (Model.Achievements.Count == 0)
+        {
+            <div class="alert alert-info">No achievements yet.</div>
+        }
+        else
+        {
+            <div class="row g-3">
+                @foreach (var achievement in Model.Achievements)
+                {
+                    <div class="col-12 col-md-6">
+                        <div class="card h-100 @(achievement.IsUnlocked ? "border-success" : "")" style="opacity:@(achievement.IsUnlocked ? "1" : "0.65")">
+                            <div class="card-body d-flex justify-content-between align-items-start gap-3">
+                                <div>
+                                    <h5 class="card-title mb-1">@achievement.Name</h5>
+                                    <p class="card-text text-muted mb-0">@achievement.Description</p>
+                                </div>
+                                <span class="badge @(achievement.IsUnlocked ? "bg-success" : "bg-secondary")">
+                                    @(achievement.IsUnlocked ? "Unlocked" : "Locked")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
