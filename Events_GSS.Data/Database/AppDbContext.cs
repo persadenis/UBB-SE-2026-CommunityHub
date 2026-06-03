@@ -20,6 +20,9 @@ public class AppDbContext : DbContext
     public DbSet<Message> Messages { get; set; }
     public DbSet<Participant> Participants { get; set; }
 
+    // Events identity/reputation mirror. This table intentionally shares GUIDs with Users.
+    public DbSet<ChatAndEvents.Data.EventsData.Models.User> EventUsers { get; set; }
+
     // Community hub
     public DbSet<HubCommunity> HubCommunities { get; set; }
     public DbSet<CommunityMembership> CommunityMemberships { get; set; }
@@ -31,6 +34,7 @@ public class AppDbContext : DbContext
 
     // Events
     public DbSet<Event> Events { get; set; }
+    public DbSet<Category> Categories { get; set; }
     public DbSet<AttendedEvent> AttendedEvents { get; set; }
     public DbSet<Memory> Memories { get; set; }
     public DbSet<MemoryLike> MemoryLikes { get; set; }
@@ -59,6 +63,13 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new ConversationConfiguration());
         modelBuilder.ApplyConfiguration(new MessageConfiguration());
         modelBuilder.ApplyConfiguration(new ParticipantConfiguration());
+
+        modelBuilder.Entity<ChatAndEvents.Data.EventsData.Models.User>(entity =>
+        {
+            entity.ToTable("User");
+            entity.HasKey(user => user.UserId);
+            entity.Property(user => user.Name).IsRequired();
+        });
 
         modelBuilder.Entity<HubCommunity>(entity =>
         {
@@ -175,16 +186,22 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfiguration(new AnnouncementConfiguration());
         modelBuilder.ApplyConfiguration(new AnnouncementReactionConfiguration());
 
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("Category");
+            entity.HasKey(category => category.CategoryId);
+            entity.Property(category => category.Title).IsRequired();
+        });
 
-        modelBuilder.Entity<ChatAndEvents.Data.EventsData.Models.Category>().HasData(
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 1, Title = "NATURE" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 2, Title = "FITNESS" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 3, Title = "MUSIC" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 4, Title = "SOCIAL" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 5, Title = "ART" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 6, Title = "PETS" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 7, Title = "TECH" },
-        new ChatAndEvents.Data.EventsData.Models.Category { CategoryId = 8, Title = "FUN" }
+        modelBuilder.Entity<Category>().HasData(
+        new Category { CategoryId = 1, Title = "NATURE" },
+        new Category { CategoryId = 2, Title = "FITNESS" },
+        new Category { CategoryId = 3, Title = "MUSIC" },
+        new Category { CategoryId = 4, Title = "SOCIAL" },
+        new Category { CategoryId = 5, Title = "ART" },
+        new Category { CategoryId = 6, Title = "PETS" },
+        new Category { CategoryId = 7, Title = "TECH" },
+        new Category { CategoryId = 8, Title = "FUN" }
         );
 
         modelBuilder.Entity<Achievement>().HasData(

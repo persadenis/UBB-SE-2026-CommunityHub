@@ -34,21 +34,7 @@ namespace ChatModule
         [ExcludeFromCodeCoverage]
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            var services = new ServiceCollection();
-            var baseAddress = new Uri("http://172.30.250.53/");
-            
-            services.AddHttpClient<IAuthenticationService, AuthenticationHttpService>(client =>
-            {
-                client.BaseAddress = baseAddress;
-            });
-
-            var provider = services.BuildServiceProvider();
-            var authService = provider.GetRequiredService<IAuthenticationService>();
-
-            _loginWindow = new LoginWindow(authService);
-            _loginWindow.LoginSucceeded += OnLoginSucceededAsync;
-
-            _window = _loginWindow;
+            _window = new WebShellWindow();
             MainAppWindow = _window;
             _window.Activate();
         }

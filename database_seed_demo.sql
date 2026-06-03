@@ -20,7 +20,7 @@ GO
 
 DECLARE @PasswordHash nvarchar(300) = '$2a$11$Y6.rMPmCDvKD8ZQuOwaIWuduKqPFrm9rF4gGhPUyoFXqJy7cDp1Yu';
 DECLARE @Now datetime2 = SYSUTCDATETIME();
-DECLARE @Codex uniqueidentifier = '5E29A2CA-884F-4FEF-B730-2615DE6E4E0A';
+DECLARE @Administrator uniqueidentifier = '5E29A2CA-884F-4FEF-B730-2615DE6E4E0A';
 
 DECLARE @DemoUsers TABLE (
     Id uniqueidentifier PRIMARY KEY,
@@ -35,14 +35,14 @@ DECLARE @DemoUsers TABLE (
 );
 
 INSERT INTO @DemoUsers VALUES
-(@Codex, 'codexmerge', 'Codex Merge', 'codexmerge@example.com', '/uploads/matchmaking/demo/codex.png', 'Testing the full Community Hub integration.', 450, '2001-02-12', '0700000000'),
+(@Administrator, 'administrator', 'Administrator', 'administrator@example.com', '/uploads/matchmaking/demo/administrator.png', 'Testing the full Community Hub integration.', 450, '2001-02-12', '0700000000'),
 ('11111111-1111-1111-1111-111111111111', 'ana_demo', 'Ana Demo', 'ana.demo@example.com', '/uploads/matchmaking/demo/ana.png', 'UX, music events and cozy community nights.', 320, '2002-03-08', '0711111111'),
 ('22222222-2222-2222-2222-222222222222', 'mara_demo', 'Mara Demo', 'mara.demo@example.com', '/uploads/matchmaking/demo/mara.png', 'Frontend, books and weekend workshops.', 280, '2003-07-19', '0722222222'),
 ('33333333-3333-3333-3333-333333333333', 'alex_demo', 'Alex Demo', 'alex.demo@example.com', '/uploads/matchmaking/demo/alex.png', 'Backend, quests and football meetups.', 510, '2000-11-02', '0733333333'),
 ('44444444-4444-4444-4444-444444444444', 'irina_demo', 'Irina Demo', 'irina.demo@example.com', '/uploads/matchmaking/demo/ana.png', 'Photography, volunteering and tech talks.', 190, '2002-09-23', '0744444444'),
 ('55555555-5555-5555-5555-555555555555', 'vlad_demo', 'Vlad Demo', 'vlad.demo@example.com', '/uploads/matchmaking/demo/alex.png', 'Gaming, hiking and event planning.', 610, '1999-12-14', '0755555555'),
 ('66666666-6666-6666-6666-666666666666', 'elena_demo', 'Elena Demo', 'elena.demo@example.com', '/uploads/matchmaking/demo/mara.png', 'Design systems, board games and coffee.', 410, '2001-05-30', '0766666666'),
-('77777777-7777-7777-7777-777777777777', 'mihai_demo', 'Mihai Demo', 'mihai.demo@example.com', '/uploads/matchmaking/demo/codex.png', 'Data, basketball and hackathons.', 360, '2000-04-17', '0777777777'),
+('77777777-7777-7777-7777-777777777777', 'mihai_demo', 'Mihai Demo', 'mihai.demo@example.com', '/uploads/matchmaking/demo/alex.png', 'Data, basketball and hackathons.', 360, '2000-04-17', '0777777777'),
 ('88888888-8888-8888-8888-888888888888', 'sofia_demo', 'Sofia Demo', 'sofia.demo@example.com', '/uploads/matchmaking/demo/ana.png', 'Art, music festivals and community quests.', 240, '2004-01-26', '0788888888'),
 ('99999999-9999-9999-9999-999999999999', 'matei_demo', 'Matei Demo', 'matei.demo@example.com', '/uploads/matchmaking/demo/alex.png', 'DevOps, chess and chill events.', 390, '2001-08-11', '0799999999');
 
@@ -82,14 +82,14 @@ DECLARE @Dating TABLE (
 );
 
 INSERT INTO @Dating VALUES
-(@Codex, 'Codex Merge', 'Man', 'Everyone', 'Cluj-Napoca', 'Here to test the app and meet people who like tech, events and community projects.', 'Community Builder', 'tech, music, board games, volunteering', '/uploads/matchmaking/demo/codex.png'),
+(@Administrator, 'Administrator', 'Man', 'Everyone', 'Cluj-Napoca', 'Here to test the app and meet people who like tech, events and community projects.', 'Community Builder', 'tech, music, board games, volunteering', '/uploads/matchmaking/demo/administrator.png'),
 ('11111111-1111-1111-1111-111111111111', 'Ana Demo', 'Woman', 'Men', 'Cluj-Napoca', 'I like live music, product design and small communities where everyone knows each other.', 'Creative Partner', 'music, design, coffee, tech', '/uploads/matchmaking/demo/ana.png'),
 ('22222222-2222-2222-2222-222222222222', 'Mara Demo', 'Woman', 'Everyone', 'Timisoara', 'Frontend person who likes books, workshops and relaxed conversations after events.', 'Slow Burn', 'frontend, books, workshops, coffee', '/uploads/matchmaking/demo/mara.png'),
 ('33333333-3333-3333-3333-333333333333', 'Alex Demo', 'Man', 'Everyone', 'Brasov', 'Backend, quests, sports and mountain trips.', 'Adventure Match', 'backend, quests, hiking, football', '/uploads/matchmaking/demo/alex.png'),
 ('44444444-4444-4444-4444-444444444444', 'Irina Demo', 'Woman', 'Everyone', 'Bucuresti', 'Photography, volunteering and late-night tech talks.', 'Curious Connector', 'photography, volunteering, tech, art', '/uploads/matchmaking/demo/ana.png'),
 ('55555555-5555-5555-5555-555555555555', 'Vlad Demo', 'Man', 'Women', 'Cluj-Napoca', 'Gaming, hiking and organizing chaotic but fun meetups.', 'Event Buddy', 'gaming, hiking, events, music', '/uploads/matchmaking/demo/alex.png'),
 ('66666666-6666-6666-6666-666666666666', 'Elena Demo', 'Woman', 'Everyone', 'Iasi', 'Design systems, board games and specialty coffee.', 'Cozy Match', 'design, board games, coffee, frontend', '/uploads/matchmaking/demo/mara.png'),
-('77777777-7777-7777-7777-777777777777', 'Mihai Demo', 'Man', 'Everyone', 'Oradea', 'Data, basketball and student hackathons.', 'High Energy', 'data, basketball, hackathons, tech', '/uploads/matchmaking/demo/codex.png'),
+('77777777-7777-7777-7777-777777777777', 'Mihai Demo', 'Man', 'Everyone', 'Oradea', 'Data, basketball and student hackathons.', 'High Energy', 'data, basketball, hackathons, tech', '/uploads/matchmaking/demo/alex.png'),
 ('88888888-8888-8888-8888-888888888888', 'Sofia Demo', 'Woman', 'Men', 'Sibiu', 'Art, music festivals and quests that get people talking.', 'Festival Match', 'art, music, festivals, quests', '/uploads/matchmaking/demo/ana.png'),
 ('99999999-9999-9999-9999-999999999999', 'Matei Demo', 'Man', 'Everyone', 'Cluj-Napoca', 'DevOps, chess and low-key hangouts.', 'Calm Match', 'devops, chess, coffee, tech', '/uploads/matchmaking/demo/alex.png');
 
@@ -117,7 +117,7 @@ SELECT UserId, PhotoUrl, 0 FROM @Dating;
 
 DECLARE @Communities TABLE (Id uniqueidentifier PRIMARY KEY, [Name] nvarchar(120), [Description] nvarchar(1000), Category nvarchar(80), OwnerId uniqueidentifier);
 INSERT INTO @Communities VALUES
-('c0010001-0000-0000-0000-000000000001', 'Weaponized Penguins Team', 'Project room for the Community Hub app, UI ideas and integration notes.', 'Tech', @Codex),
+('c0010001-0000-0000-0000-000000000001', 'Weaponized Penguins Team', 'Project room for the Community Hub app, UI ideas and integration notes.', 'Tech', @Administrator),
 ('c0010002-0000-0000-0000-000000000002', 'Cluj Tech Hangout', 'Casual meetups for students who want to build and test things together.', 'Tech', '33333333-3333-3333-3333-333333333333'),
 ('c0010003-0000-0000-0000-000000000003', 'Board Game Nights', 'Weekly board game and social nights.', 'Social', '66666666-6666-6666-6666-666666666666'),
 ('c0010004-0000-0000-0000-000000000004', 'Music Hunters', 'Find concerts, small gigs and festival friends.', 'Music', '11111111-1111-1111-1111-111111111111'),
@@ -143,12 +143,12 @@ INSERT INTO CommunityMemberships (CommunityId, UserId, IsAdmin, JoinedAt)
 SELECT c.Id, u.Id, CASE WHEN c.OwnerId = u.Id THEN 1 ELSE 0 END, DATEADD(day, -ABS(CHECKSUM(NEWID())) % 20, @Now)
 FROM @CommunityIds c
 CROSS JOIN @DemoUsers u
-WHERE (c.[Name] IN ('Weaponized Penguins Team', 'Cluj Tech Hangout') OR u.Id IN (@Codex, c.OwnerId))
+WHERE (c.[Name] IN ('Weaponized Penguins Team', 'Cluj Tech Hangout') OR u.Id IN (@Administrator, c.OwnerId))
 AND NOT EXISTS (SELECT 1 FROM CommunityMemberships m WHERE m.CommunityId = c.Id AND m.UserId = u.Id);
 
 MERGE CommunityPosts AS target
 USING (VALUES
-('d0010001-0000-0000-0000-000000000001', 'Weaponized Penguins Team', @Codex, 'Demo database is ready', 'This seed adds users, friends, events, quests, communities and matchmaking data.'),
+('d0010001-0000-0000-0000-000000000001', 'Weaponized Penguins Team', @Administrator, 'Demo database is ready', 'This seed adds users, friends, events, quests, communities and matchmaking data.'),
 ('d0010002-0000-0000-0000-000000000002', 'Cluj Tech Hangout', '33333333-3333-3333-3333-333333333333', 'Friday testing meetup', 'Bring laptops. We will test login, events, chat and matchmaking.'),
 ('d0010003-0000-0000-0000-000000000003', 'Music Hunters', '11111111-1111-1111-1111-111111111111', 'Concert buddies needed', 'Looking for people who want to join the next local music event.')
 ) AS source (Id, CommunityName, AuthorId, Title, Body)
@@ -159,11 +159,11 @@ VALUES (source.Id, (SELECT Id FROM @CommunityIds WHERE [Name] = source.Community
 
 MERGE Friends AS target
 USING (VALUES
-('f0010001-0000-0000-0000-000000000001', @Codex, '11111111-1111-1111-1111-111111111111', 1, 0),
-('f0010002-0000-0000-0000-000000000002', @Codex, '22222222-2222-2222-2222-222222222222', 1, 0),
-('f0010003-0000-0000-0000-000000000003', @Codex, '55555555-5555-5555-5555-555555555555', 1, 0),
-('f0010004-0000-0000-0000-000000000004', '44444444-4444-4444-4444-444444444444', @Codex, 0, 0),
-('f0010005-0000-0000-0000-000000000005', @Codex, '33333333-3333-3333-3333-333333333333', 0, 0)
+('f0010001-0000-0000-0000-000000000001', @Administrator, '11111111-1111-1111-1111-111111111111', 1, 0),
+('f0010002-0000-0000-0000-000000000002', @Administrator, '22222222-2222-2222-2222-222222222222', 1, 0),
+('f0010003-0000-0000-0000-000000000003', @Administrator, '55555555-5555-5555-5555-555555555555', 1, 0),
+('f0010004-0000-0000-0000-000000000004', '44444444-4444-4444-4444-444444444444', @Administrator, 0, 0),
+('f0010005-0000-0000-0000-000000000005', @Administrator, '33333333-3333-3333-3333-333333333333', 0, 0)
 ) AS source (Id, UserId1, UserId2, [Status], IsMatch)
 ON target.Id = source.Id
 WHEN MATCHED THEN UPDATE SET UserId1 = source.UserId1, UserId2 = source.UserId2, [Status] = source.[Status], IsMatch = source.IsMatch
@@ -171,9 +171,9 @@ WHEN NOT MATCHED THEN INSERT (Id, UserId1, UserId2, [Status], IsMatch, CreatedAt
 
 MERGE Conversations AS target
 USING (VALUES
-('a0010001-0000-0000-0000-000000000001', 0, NULL, NULL, @Codex, 'Ana: See you at the music quest?', DATEADD(hour, -4, @Now)),
-('a0010002-0000-0000-0000-000000000002', 0, NULL, NULL, @Codex, 'Mara: I pushed the UI notes.', DATEADD(hour, -7, @Now)),
-('a0010003-0000-0000-0000-000000000003', 0, NULL, NULL, @Codex, 'Vlad: Board games tonight?', DATEADD(day, -1, @Now))
+('a0010001-0000-0000-0000-000000000001', 0, NULL, NULL, @Administrator, 'Ana: See you at the music quest?', DATEADD(hour, -4, @Now)),
+('a0010002-0000-0000-0000-000000000002', 0, NULL, NULL, @Administrator, 'Mara: I pushed the UI notes.', DATEADD(hour, -7, @Now)),
+('a0010003-0000-0000-0000-000000000003', 0, NULL, NULL, @Administrator, 'Vlad: Board games tonight?', DATEADD(day, -1, @Now))
 ) AS source (Id, [Type], Title, IconUrl, CreatedBy, LastMessagePreview, LastMessageAt)
 ON target.Id = source.Id
 WHEN MATCHED THEN UPDATE SET LastMessagePreview = source.LastMessagePreview, LastMessageAt = source.LastMessageAt
@@ -183,16 +183,16 @@ VALUES (source.Id, source.[Type], source.Title, source.IconUrl, source.CreatedBy
 INSERT INTO Participants (Id, ConversationId, UserId, JoinedAt, [Role], LastReadMessageId, TimeoutUntil, IsFavourite, IsNew, Nickname)
 SELECT NEWID(), v.ConversationId, v.UserId, DATEADD(day, -5, @Now), 1, NULL, NULL, 0, 0, NULL
 FROM (VALUES
-('a0010001-0000-0000-0000-000000000001', @Codex), ('a0010001-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111'),
-('a0010002-0000-0000-0000-000000000002', @Codex), ('a0010002-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222'),
-('a0010003-0000-0000-0000-000000000003', @Codex), ('a0010003-0000-0000-0000-000000000003', '55555555-5555-5555-5555-555555555555')
+('a0010001-0000-0000-0000-000000000001', @Administrator), ('a0010001-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111'),
+('a0010002-0000-0000-0000-000000000002', @Administrator), ('a0010002-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222'),
+('a0010003-0000-0000-0000-000000000003', @Administrator), ('a0010003-0000-0000-0000-000000000003', '55555555-5555-5555-5555-555555555555')
 ) AS v(ConversationId, UserId)
 WHERE NOT EXISTS (SELECT 1 FROM Participants p WHERE p.ConversationId = v.ConversationId AND p.UserId = v.UserId);
 
 MERGE Messages AS target
 USING (VALUES
 ('b0010001-0000-0000-0000-000000000001', 'a0010001-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'See you at the music quest?', DATEADD(hour, -4, @Now)),
-('b0010002-0000-0000-0000-000000000002', 'a0010001-0000-0000-0000-000000000001', @Codex, 'Yes, I want to test event attendance too.', DATEADD(hour, -3, @Now)),
+('b0010002-0000-0000-0000-000000000002', 'a0010001-0000-0000-0000-000000000001', @Administrator, 'Yes, I want to test event attendance too.', DATEADD(hour, -3, @Now)),
 ('b0010003-0000-0000-0000-000000000003', 'a0010002-0000-0000-0000-000000000002', '22222222-2222-2222-2222-222222222222', 'I pushed the UI notes.', DATEADD(hour, -7, @Now)),
 ('b0010004-0000-0000-0000-000000000004', 'a0010003-0000-0000-0000-000000000003', '55555555-5555-5555-5555-555555555555', 'Board games tonight?', DATEADD(day, -1, @Now))
 ) AS source (Id, ConversationId, UserId, Content, CreatedAt)
@@ -203,7 +203,7 @@ VALUES (source.Id, source.ConversationId, source.UserId, source.Content, source.
 
 DECLARE @Events TABLE ([Name] nvarchar(200), [Location] nvarchar(160), StartDateTime datetime2, EndDateTime datetime2, [Description] nvarchar(max), MaximumPeople int, AdminId uniqueidentifier, CategoryId int);
 INSERT INTO @Events VALUES
-('Community Hub Launch Night', 'Cluj-Napoca', DATEADD(day, 3, @Now), DATEADD(day, 3, DATEADD(hour, 3, @Now)), 'Demo launch event with quests, discussions and memories.', 80, @Codex, 7),
+('Community Hub Launch Night', 'Cluj-Napoca', DATEADD(day, 3, @Now), DATEADD(day, 3, DATEADD(hour, 3, @Now)), 'Demo launch event with quests, discussions and memories.', 80, @Administrator, 7),
 ('Music Quest Weekend', 'Sibiu', DATEADD(day, 7, @Now), DATEADD(day, 7, DATEADD(hour, 5, @Now)), 'A social music event with XP quests for finding local artists.', 120, '11111111-1111-1111-1111-111111111111', 3),
 ('Board Games Social', 'Cluj-Napoca', DATEADD(day, 10, @Now), DATEADD(day, 10, DATEADD(hour, 4, @Now)), 'Casual board game night for friends and new members.', 40, '66666666-6666-6666-6666-666666666666', 4),
 ('Mountain Cleanup Quest', 'Brasov', DATEADD(day, 14, @Now), DATEADD(day, 14, DATEADD(hour, 6, @Now)), 'Nature volunteering event with reputation rewards.', 60, '33333333-3333-3333-3333-333333333333', 1),
@@ -229,9 +229,9 @@ CROSS APPLY (VALUES
 WHERE NOT EXISTS (SELECT 1 FROM Quests existing WHERE existing.EventId = e.EventId AND existing.[Name] = q.[Name]);
 
 INSERT INTO AttendedEvents (EventId, UserId, EnrollmentDate, IsArchived, IsFavourite, UnreadAnnouncementCount)
-SELECT e.EventId, u.Id, DATEADD(day, -1, @Now), 0, CASE WHEN u.Id = @Codex THEN 1 ELSE 0 END, CASE WHEN u.Id = @Codex THEN 2 ELSE 0 END
+SELECT e.EventId, u.Id, DATEADD(day, -1, @Now), 0, CASE WHEN u.Id = @Administrator THEN 1 ELSE 0 END, CASE WHEN u.Id = @Administrator THEN 2 ELSE 0 END
 FROM @EventIds e
-JOIN @DemoUsers u ON u.Id IN (@Codex, '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')
+JOIN @DemoUsers u ON u.Id IN (@Administrator, '11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222', '33333333-3333-3333-3333-333333333333')
 WHERE NOT EXISTS (SELECT 1 FROM AttendedEvents ae WHERE ae.EventId = e.EventId AND ae.UserId = u.Id);
 
 UPDATE ev
@@ -248,19 +248,19 @@ WHERE FromUserId IN (SELECT Id FROM @DemoUsers)
    OR ToUserId IN (SELECT Id FROM @DemoUsers);
 
 INSERT INTO DatingSwipes (FromUserId, ToUserId, [Action], CreatedAt) VALUES
-(@Codex, '11111111-1111-1111-1111-111111111111', 'Like', DATEADD(hour, -5, @Now)),
-('11111111-1111-1111-1111-111111111111', @Codex, 'Like', DATEADD(hour, -6, @Now)),
-(@Codex, '33333333-3333-3333-3333-333333333333', 'Like', DATEADD(hour, -3, @Now)),
-('33333333-3333-3333-3333-333333333333', @Codex, 'SuperLike', DATEADD(hour, -2, @Now)),
-('88888888-8888-8888-8888-888888888888', @Codex, 'Like', DATEADD(hour, -1, @Now));
+(@Administrator, '11111111-1111-1111-1111-111111111111', 'Like', DATEADD(hour, -5, @Now)),
+('11111111-1111-1111-1111-111111111111', @Administrator, 'Like', DATEADD(hour, -6, @Now)),
+(@Administrator, '33333333-3333-3333-3333-333333333333', 'Like', DATEADD(hour, -3, @Now)),
+('33333333-3333-3333-3333-333333333333', @Administrator, 'SuperLike', DATEADD(hour, -2, @Now)),
+('88888888-8888-8888-8888-888888888888', @Administrator, 'Like', DATEADD(hour, -1, @Now));
 
 INSERT INTO Notifications (UserId, Title, [Description], CreatedAt, IsRead, [Type], SourceFeature, SourceEntityId)
 SELECT n.UserId, n.Title, n.[Description], @Now, 0, n.[Type], n.SourceFeature, n.SourceEntityId
 FROM (VALUES
-(@Codex, 'New friend request', 'Irina Demo sent you a friend request.', 'FriendRequest', 'Friends', '44444444-4444-4444-4444-444444444444'),
-(@Codex, 'New matchmaking match', 'You matched with Ana Demo.', 'Matchmaking', 'Matchmaking', '11111111-1111-1111-1111-111111111111'),
-(@Codex, 'Upcoming event', 'Community Hub Launch Night starts soon.', 'Event', 'Events', 'Community Hub Launch Night'),
-(@Codex, 'Quest available', 'New quests are available in your enrolled events.', 'Quest', 'Events', 'QuestSeed')
+(@Administrator, 'New friend request', 'Irina Demo sent you a friend request.', 'FriendRequest', 'Friends', '44444444-4444-4444-4444-444444444444'),
+(@Administrator, 'New matchmaking match', 'You matched with Ana Demo.', 'Matchmaking', 'Matchmaking', '11111111-1111-1111-1111-111111111111'),
+(@Administrator, 'Upcoming event', 'Community Hub Launch Night starts soon.', 'Event', 'Events', 'Community Hub Launch Night'),
+(@Administrator, 'Quest available', 'New quests are available in your enrolled events.', 'Quest', 'Events', 'QuestSeed')
 ) n(UserId, Title, [Description], [Type], SourceFeature, SourceEntityId)
 WHERE NOT EXISTS (
     SELECT 1 FROM Notifications existing

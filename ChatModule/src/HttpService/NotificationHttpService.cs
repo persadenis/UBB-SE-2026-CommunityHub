@@ -19,10 +19,16 @@ namespace ChatAndEvents.Data.EventsData.Services
             _httpClient = httpClient;
         }
 
-        public async Task NotifyAsync(Guid userId, string title, string description)
+        public async Task NotifyAsync(
+            Guid userId,
+            string title,
+            string description,
+            string type = "General",
+            string sourceFeature = "System",
+            string? sourceEntityId = null)
         {
             var response = await _httpClient.PostAsync(
-                $"api/Notifications?userId={userId}&title={Uri.EscapeDataString(title)}&description={Uri.EscapeDataString(description)}",
+                $"api/Notifications?userId={userId}&title={Uri.EscapeDataString(title)}&description={Uri.EscapeDataString(description)}&type={Uri.EscapeDataString(type)}&sourceFeature={Uri.EscapeDataString(sourceFeature)}&sourceEntityId={Uri.EscapeDataString(sourceEntityId ?? string.Empty)}",
                 null);
 
             response.EnsureSuccessStatusCode();
@@ -39,6 +45,17 @@ namespace ChatAndEvents.Data.EventsData.Services
         public async Task DeleteAsync(int notificationId)
         {
             var response = await _httpClient.DeleteAsync($"api/Notifications/{notificationId}");
+            response.EnsureSuccessStatusCode();
+        }
+
+        public async Task<int> CountUnreadAsync(Guid userId)
+        {
+            return await _httpClient.GetFromJsonAsync<int>($"api/Notifications/{userId}/unread-count");
+        }
+
+        public async Task MarkAsReadAsync(int notificationId, Guid userId)
+        {
+            var response = await _httpClient.PutAsync($"api/Notifications/{notificationId}/read?userId={userId}", null);
             response.EnsureSuccessStatusCode();
         }
     }

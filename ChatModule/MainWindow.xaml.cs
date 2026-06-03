@@ -70,8 +70,10 @@ namespace ChatModule
         private readonly IModerationService _moderationService;
 
         private const string ConnectionString =
-            "Data Source=.\\SQLEXPRESS;Initial Catalog=ChatAndEventsDB;" +
+            "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ChatAndEventsDB;" +
             "Integrated Security=True;Encrypt=True;TrustServerCertificate=True;";
+
+        private static readonly Uri ApiBaseAddress = new("http://localhost:5572/");
 
         public MainWindow()
             : this(Guid.Empty, "guest")
@@ -105,7 +107,7 @@ namespace ChatModule
             // ==========================================================
             // --- THE BATCH SWITCH: NEW CLOUD HTTP SERVICES ---
             // ==========================================================
-            var baseAddress = new Uri("http://172.30.250.53/");
+            var baseAddress = ApiBaseAddress;
 
             services.AddHttpClient<IMemberPanelService, MemberPanelHttpService>(client =>
             {
