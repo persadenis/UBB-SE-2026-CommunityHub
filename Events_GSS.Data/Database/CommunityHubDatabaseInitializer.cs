@@ -176,7 +176,7 @@ public static class CommunityHubDatabaseInitializer
                     FROM information_schema.tables
                     WHERE table_schema = 'communityhub'
                       AND table_name = 'Users'
-                ) THEN 1 ELSE 0 END
+                ) THEN 1 ELSE 0 END AS "Value"
                 """).SingleAsync();
 
             if (hasUsersTable == 0)

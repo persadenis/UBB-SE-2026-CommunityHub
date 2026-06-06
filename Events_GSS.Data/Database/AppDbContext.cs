@@ -61,6 +61,13 @@ public class AppDbContext : DbContext
         if (Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
         {
             modelBuilder.HasDefaultSchema("communityhub");
+
+            foreach (var property in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(entity => entity.GetProperties())
+                .Where(property => property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?)))
+            {
+                property.SetColumnType("timestamp without time zone");
+            }
         }
 
         modelBuilder.ApplyConfiguration(new UserConfiguration());
