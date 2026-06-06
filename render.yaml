@@ -1,11 +1,13 @@
 services:
-  - type: pserv
-    name: communityhub-api
+  - type: web
+    name: communityhub-api-persadenis
     runtime: docker
     repo: https://github.com/persadenis/UBB-SE-2026-CommunityHub
     branch: main
     dockerfilePath: ./Dockerfile.api
     dockerContext: .
+    plan: free
+    healthCheckPath: /health
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
@@ -21,17 +23,14 @@ services:
           property: connectionString
 
   - type: web
-    name: communityhub-web
+    name: communityhub-web-persadenis
     runtime: docker
     repo: https://github.com/persadenis/UBB-SE-2026-CommunityHub
     branch: main
     dockerfilePath: ./Dockerfile.web
     dockerContext: .
+    plan: free
     healthCheckPath: /health
-    disk:
-      name: communityhub-uploads
-      mountPath: /var/data
-      sizeGB: 1
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
@@ -39,15 +38,10 @@ services:
         value: true
       - key: PORT
         value: 10000
-      - key: UPLOADS_ROOT
-        value: /var/data/uploads
       - key: DatabaseProvider
         value: PostgreSQL
-      - key: API_HOSTPORT
-        fromService:
-          type: pserv
-          name: communityhub-api
-          property: hostport
+      - key: Api__BaseAddress
+        value: https://communityhub-api-persadenis.onrender.com/
       - key: ConnectionStrings__ChatAndEventsDB
         fromDatabase:
           name: communityhub-db
@@ -57,4 +51,4 @@ databases:
   - name: communityhub-db
     databaseName: communityhub
     user: communityhub
-    plan: basic-256mb
+    plan: free
