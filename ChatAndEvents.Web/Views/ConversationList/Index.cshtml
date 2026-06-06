@@ -61,7 +61,10 @@
                             </button>
                         </form>
                         
-                        <a href="/Chat/Index?conversationId=@conv.Id&currentUserId=11111111-1111-1111-1111-111111111111" class="btn btn-sm btn-primary">
+                        <a asp-controller="Chat"
+                           asp-action="Index"
+                           asp-route-conversationId="@conv.Id"
+                           class="btn btn-sm btn-primary">
                             Open Chat
                         </a>
                     </div>

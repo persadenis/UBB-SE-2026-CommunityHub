@@ -1,4 +1,5 @@
 using ChatAndEvents.Data.EventsData.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatAndEvents.Web.Models;
 
@@ -37,6 +38,8 @@ public class CreateEventViewModel
     public string MaximumPeopleText { get; set; } = string.Empty;
 
     public string? EventBannerPath { get; set; }
+
+    public IFormFile? EventBannerFile { get; set; }
 
     public int? SelectedCategoryId { get; set; }
 

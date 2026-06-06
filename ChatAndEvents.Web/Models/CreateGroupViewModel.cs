@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatAndEvents.Web.Models
 {
@@ -11,6 +12,8 @@ namespace ChatAndEvents.Web.Models
         public string GroupName { get; set; } = string.Empty;
 
         public string? IconUrl { get; set; }
+
+        public IFormFile? IconFile { get; set; }
 
         // Comma-separated user IDs submitted with the form
         public string SelectedMemberIds { get; set; } = string.Empty;

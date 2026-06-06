@@ -34,12 +34,17 @@ public static class CommunityHubDatabaseInitializer
                     [Name] nvarchar(120) NOT NULL,
                     [Description] nvarchar(1000) NOT NULL,
                     Category nvarchar(80) NOT NULL,
+                    BannerUrl nvarchar(1000) NULL,
                     OwnerId uniqueidentifier NOT NULL,
                     CreatedAt datetime2 NOT NULL,
                     CONSTRAINT FK_HubCommunities_Users_OwnerId FOREIGN KEY (OwnerId) REFERENCES Users(Id)
                 );
                 CREATE UNIQUE INDEX IX_HubCommunities_Name ON HubCommunities([Name]);
             END
+            """,
+            """
+            IF COL_LENGTH('HubCommunities', 'BannerUrl') IS NULL
+                ALTER TABLE HubCommunities ADD BannerUrl nvarchar(1000) NULL;
             """,
             """
             IF OBJECT_ID('CommunityMemberships', 'U') IS NULL

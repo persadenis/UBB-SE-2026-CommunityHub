@@ -104,6 +104,6 @@ public class FriendListController : Controller
         return RedirectToAction(
             "Index",
             "Chat",
-            new { conversationId = conversation.Id, currentUserId = _currentUserContext.UserId });
+            new { conversationId = conversation.Id });
     }
 }

@@ -41,7 +41,6 @@
         {
             <form asp-controller="Chat" asp-action="SendMessage" method="post" class="d-flex">
                 <input type="hidden" name="conversationId" value="@Model.ConversationId" />
-                <input type="hidden" name="currentUserId" value="@Model.CurrentUserId" />
 
                 <input type="text" name="messageInput" class="form-control me-2" placeholder="Type a message..." required />
                 <button type="submit" class="btn btn-success">Send</button>

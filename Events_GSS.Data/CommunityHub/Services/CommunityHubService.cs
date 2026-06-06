@@ -83,7 +83,7 @@ public class CommunityHubService : ICommunityHubService
             .ToList();
     }
 
-    public async Task<HubCommunity> CreateAsync(Guid ownerId, string name, string description, string category)
+    public async Task<HubCommunity> CreateAsync(Guid ownerId, string name, string description, string category, string? bannerUrl = null)
     {
         using var db = await _contextFactory.CreateDbContextAsync();
         var community = new HubCommunity
@@ -92,6 +92,7 @@ public class CommunityHubService : ICommunityHubService
             Name = name.Trim(),
             Description = description.Trim(),
             Category = string.IsNullOrWhiteSpace(category) ? "General" : category.Trim(),
+            BannerUrl = string.IsNullOrWhiteSpace(bannerUrl) ? null : bannerUrl,
         };
 
         community.Members.Add(new CommunityMembership

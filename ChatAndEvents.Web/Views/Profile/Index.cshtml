@@ -75,15 +75,17 @@
             </div>
         </div>
 
-        <form asp-action="Save" method="post" class="profile-panel">
+        <form asp-action="Save" method="post" enctype="multipart/form-data" class="profile-panel">
             <div class="mb-3">
                 <label for="bio" class="form-label">Bio</label>
                 <textarea id="bio" name="bio" class="form-control" rows="4">@Model.Bio</textarea>
             </div>
 
             <div class="mb-3">
-                <label for="avatarUrl" class="form-label">Avatar URL</label>
-                <input id="avatarUrl" name="avatarUrl" value="@Model.AvatarUrl" class="form-control" />
+                <label for="avatarFile" class="form-label">Profile picture</label>
+                <input type="hidden" id="avatarUrl" name="avatarUrl" value="@Model.AvatarUrl" />
+                <input id="avatarFile" name="avatarFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                <div class="form-text">Upload a JPG, PNG, or WebP image from your device.</div>
             </div>
 
             <div class="row g-3">

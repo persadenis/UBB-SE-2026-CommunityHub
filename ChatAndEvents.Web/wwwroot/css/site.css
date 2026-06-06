@@ -513,7 +513,7 @@ body {
   }
 }
 
-/* Weaponized Penguins web shell */
+/* Community Hub web shell */
 :root {
   --wp-app-bg: #e6e2ff;
   --wp-vivid: #785ac8;
@@ -555,14 +555,26 @@ html {
 .wp-logo-link {
   display: flex;
   align-items: center;
+  gap: 10px;
   height: 100%;
   padding-left: 38px;
+  color: #ffffff;
+  font-size: 1.24rem;
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .wp-logo {
-  width: 200px;
-  max-height: 64px;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
   object-fit: contain;
+}
+
+.wp-logo-link:hover {
+  color: #ffffff;
 }
 
 .wp-search {
@@ -1526,6 +1538,56 @@ html {
   color: #6b588c;
 }
 
+.wp-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wp-choice-chip {
+  border: 1px solid rgba(117, 87, 180, 0.28);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #59477a;
+  background: #ffffff;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wp-choice-chip:hover {
+  border-color: #8e54e9;
+  color: #8e54e9;
+}
+
+.wp-choice-chip.is-selected {
+  border-color: #8e54e9;
+  color: #ffffff;
+  background: #8e54e9;
+}
+
+.banner-preview-image {
+  width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.wp-community-thumb {
+  width: 96px;
+  height: 72px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e8edf7;
+}
+
+.wp-community-detail-banner {
+  width: 100%;
+  max-height: 260px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
 .wp-auth-main {
   min-height: 100vh;
   display: grid;
@@ -1568,8 +1630,8 @@ html {
 }
 
 .wp-auth-brand img {
-  max-width: 170px;
-  max-height: 96px;
+  width: 92px;
+  height: 92px;
   object-fit: contain;
 }
 

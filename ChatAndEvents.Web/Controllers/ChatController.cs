@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ChatAndEvents.Data.ChatData.serviceInterfaces.Services;
 using ChatAndEvents.Data.ChatData.services;
+using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatAndEvents.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 namespace ChatAndEvents.Web.Controllers
@@ -13,20 +14,24 @@ namespace ChatAndEvents.Web.Controllers
         private readonly IMessageService _messageService;
         private readonly IConversationListService _conversationListService;
         private readonly IReadReceiptService _readReceiptService;
+        private readonly CurrentUserContext _currentUserContext;
 
         public ChatController(
             IMessageService messageService,
             IConversationListService conversationListService,
-            IReadReceiptService readReceiptService)
+            IReadReceiptService readReceiptService,
+            CurrentUserContext currentUserContext)
         {
             _messageService = messageService;
             _conversationListService = conversationListService;
             _readReceiptService = readReceiptService;
+            _currentUserContext = currentUserContext;
         }
         
         [HttpGet]
-        public async Task<IActionResult> Index(Guid conversationId, Guid currentUserId)
+        public async Task<IActionResult> Index(Guid conversationId)
         {
+            var currentUserId = _currentUserContext.UserId;
             var conversation = await _conversationListService.GetByIdAsync(conversationId);
             if (conversation == null) return NotFound();
 
@@ -50,14 +55,15 @@ namespace ChatAndEvents.Web.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> SendMessage(Guid conversationId, Guid currentUserId, string messageInput)
+        public async Task<IActionResult> SendMessage(Guid conversationId, string messageInput)
         {
+            var currentUserId = _currentUserContext.UserId;
             if (!string.IsNullOrWhiteSpace(messageInput))
             {
                 await _messageService.SendMessageAsync(conversationId, currentUserId, messageInput, null);
             }
             
-            return RedirectToAction("Index", new { conversationId = conversationId, currentUserId = currentUserId });
+            return RedirectToAction("Index", new { conversationId = conversationId });
         }
     }
 }

@@ -14,12 +14,13 @@
             <div class="alert alert-danger">@Model.ErrorMessage</div>
         }
 
-        <form asp-action="Create" method="post" id="create-group-form">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" id="create-group-form">
             @Html.AntiForgeryToken()
 
             @* Hidden field carries the comma-separated member IDs on submit *@
             <input type="hidden" id="selected-member-ids" name="SelectedMemberIds"
                    value="@Model.SelectedMemberIds" />
+            <input type="hidden" asp-for="IconUrl" />
 
             <div class="mb-3">
                 <label asp-for="GroupName" class="form-label"></label>
@@ -29,9 +30,9 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="IconUrl" class="form-label">Group icon URL (optional)</label>
-                <input asp-for="IconUrl" class="form-control"
-                       placeholder="https://..." />
+                <label asp-for="IconFile" class="form-label">Group icon</label>
+                <input asp-for="IconFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                <div class="form-text">Upload a JPG, PNG, or WebP image from your device.</div>
             </div>
 
             <hr class="my-3" />

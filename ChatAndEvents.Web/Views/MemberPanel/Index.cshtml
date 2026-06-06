@@ -13,8 +13,7 @@
         <a class="btn btn-outline-secondary"
            asp-controller="Chat"
            asp-action="Index"
-           asp-route-conversationId="@Model.ConversationId"
-           asp-route-currentUserId="@Model.CurrentUserId">Back to chat</a>
+           asp-route-conversationId="@Model.ConversationId">Back to chat</a>
     </div>
 
     @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))

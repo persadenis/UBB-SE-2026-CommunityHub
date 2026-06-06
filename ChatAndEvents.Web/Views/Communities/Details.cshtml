@@ -7,11 +7,15 @@
 <div class="hub-page">
     <div class="detail-header">
         <div class="detail-heading">
+            @if (!string.IsNullOrWhiteSpace(Model.Community.BannerUrl))
+            {
+                <img class="wp-community-detail-banner" src="@Model.Community.BannerUrl" alt="@Model.Community.Name banner" />
+            }
             <h1>@Model.Community.Name</h1>
             <p>@Model.Community.Description</p>
             <span class="badge text-bg-secondary">@Model.Community.Category</span>
         </div>
-        <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        <a asp-action="Discover" class="btn btn-outline-secondary">Back</a>
     </div>
 
     @if (TempData["CommunityMessage"] != null)

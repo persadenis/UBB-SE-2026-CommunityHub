@@ -15,7 +15,13 @@
 
     <form asp-action="Index" method="get" class="filter-bar">
         <input class="form-control" name="searchQuery" value="@Model.SearchQuery" placeholder="Search by title" />
-        <input class="form-control" name="locationFilter" value="@Model.LocationFilter" placeholder="Filter by location" />
+        <select class="form-select" name="locationFilter">
+            <option value="">All cities</option>
+            @foreach (var location in EventListingViewModel.LocationOptions)
+            {
+                <option value="@location" selected="@(location == Model.LocationFilter)">@location</option>
+            }
+        </select>
         <button class="btn btn-outline-primary" type="submit">Apply</button>
         <a class="btn btn-outline-secondary" asp-action="Index">Reset</a>
     </form>

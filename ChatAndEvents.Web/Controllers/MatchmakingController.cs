@@ -84,9 +84,12 @@ public class MatchmakingController : Controller
     {
         var uploadedPhotoUrls = await SaveUploadedPhotosAsync(model.PhotoFiles);
         var photoUrls = BuildPhotoList(model.ExistingPhotoUrls, uploadedPhotoUrls);
-        var preferredGenders = model.PreferredGenderSelections.Any()
-            ? string.Join(", ", model.PreferredGenderSelections)
-            : model.PreferredGenders;
+        var preferredGenders = !string.IsNullOrWhiteSpace(model.PreferredGenders)
+            ? model.PreferredGenders
+            : model.PreferredGenderSelections.FirstOrDefault() ?? string.Empty;
+        var interests = model.SelectedInterests.Any()
+            ? string.Join(", ", model.SelectedInterests)
+            : model.Interests;
 
         await _matchmakingService.SaveProfileAsync(
             _currentUserContext.UserId,
@@ -95,7 +98,7 @@ public class MatchmakingController : Controller
             preferredGenders,
             model.Location,
             model.DatingBio,
-            model.Interests,
+            interests,
             photoUrls,
             model.MinPreferredAge,
             model.MaxPreferredAge,
@@ -197,7 +200,7 @@ public class MatchmakingController : Controller
         return RedirectToAction(
             "Index",
             "Chat",
-            new { conversationId = conversation.Id, currentUserId = _currentUserContext.UserId });
+            new { conversationId = conversation.Id });
     }
 
     private async Task<IReadOnlyList<string>> SaveUploadedPhotosAsync(IEnumerable<IFormFile> photoFiles)

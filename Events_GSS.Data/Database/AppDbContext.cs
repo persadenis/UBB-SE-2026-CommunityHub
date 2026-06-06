@@ -78,6 +78,7 @@ public class AppDbContext : DbContext
             entity.Property(community => community.Name).HasMaxLength(120).IsRequired();
             entity.Property(community => community.Description).HasMaxLength(1000).IsRequired();
             entity.Property(community => community.Category).HasMaxLength(80).IsRequired();
+            entity.Property(community => community.BannerUrl).HasMaxLength(1000);
             entity.HasIndex(community => community.Name).IsUnique();
             entity.HasOne(community => community.Owner)
                 .WithMany()

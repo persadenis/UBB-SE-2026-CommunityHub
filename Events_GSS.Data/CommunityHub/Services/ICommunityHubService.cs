@@ -10,7 +10,7 @@ public interface ICommunityHubService
 
     Task<IReadOnlyList<string>> GetCategoriesAsync();
 
-    Task<HubCommunity> CreateAsync(Guid ownerId, string name, string description, string category);
+    Task<HubCommunity> CreateAsync(Guid ownerId, string name, string description, string category, string? bannerUrl = null);
 
     Task JoinAsync(Guid communityId, Guid userId);
 

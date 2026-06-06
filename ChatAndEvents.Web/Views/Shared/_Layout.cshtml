@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+@inject ChatAndEvents.Data.EventsData.Services.reputationService.IReputationService ReputationService
+@inject ChatAndEvents.Data.EventsData.Services.userServices.CurrentUserContext CurrentUserContext
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,22 +14,35 @@
 @{
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
     var userName = User.Identity?.Name ?? "Guest";
+    var reputationPoints = 0;
+    if (isAuthenticated && CurrentUserContext.UserId != Guid.Empty)
+    {
+        try
+        {
+            reputationPoints = await ReputationService.GetReputationPointsAsync(CurrentUserContext.UserId);
+        }
+        catch
+        {
+            reputationPoints = 0;
+        }
+    }
 }
 <body class="wp-body @(isAuthenticated ? "wp-body-authenticated" : "wp-body-guest")">
     @if (isAuthenticated)
     {
         <header class="wp-header">
             <a class="wp-logo-link" asp-controller="MainWindow" asp-action="Index" aria-label="Community Hub home">
-                <img src="~/images/WPLogo.png" alt="Weaponized Penguins" class="wp-logo" />
+                <img src="~/images/CommunityHubMark.png" alt="" class="wp-logo" />
+                <span>Community Hub</span>
             </a>
 
-            <form class="wp-search" asp-controller="Communities" asp-action="Index" method="get">
+            <form class="wp-search" asp-controller="Communities" asp-action="Discover" method="get">
                 <input name="query" placeholder="Search communities..." autocomplete="off" />
                 <button type="submit" aria-label="Search communities">Search</button>
             </form>
 
             <div class="wp-user-strip">
-                <span class="wp-token">0 Tokens</span>
+                <span class="wp-token">@reputationPoints XP</span>
                 <span class="wp-user">@userName</span>
             </div>
         </header>
@@ -36,8 +51,8 @@
             <aside class="wp-left-rail">
                 <nav class="wp-nav-list">
                     <a asp-controller="MainWindow" asp-action="Index">Home</a>
-                    <a asp-controller="Communities" asp-action="Index">Discovery</a>
-                    <a asp-controller="Communities" asp-action="Index" asp-fragment="start-community">Start Community</a>
+                    <a asp-controller="Communities" asp-action="Discover">Discovery</a>
+                    <a asp-controller="Communities" asp-action="Start">Start Community</a>
                 </nav>
 
                 <div class="wp-rail-title">SOCIAL</div>
@@ -75,7 +90,7 @@
                     <strong>Friend requests</strong>
                     <span>Review pending social requests.</span>
                 </a>
-                <a class="wp-notification-card" asp-controller="Communities" asp-action="Index">
+                <a class="wp-notification-card" asp-controller="Communities" asp-action="Discover">
                     <strong>Community discovery</strong>
                     <span>Find groups that match your interests.</span>
                 </a>

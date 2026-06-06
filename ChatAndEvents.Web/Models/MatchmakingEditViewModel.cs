@@ -22,6 +22,38 @@ public class MatchmakingEditViewModel
         "Everyone",
     ];
 
+    public static readonly IReadOnlyList<string> LoverTypeOptions =
+    [
+        "Creative Partner",
+        "Adventure Match",
+        "Cozy Match",
+        "Event Buddy",
+        "Slow Burn",
+        "High Energy",
+        "Calm Match",
+        "Community Builder",
+    ];
+
+    public static readonly IReadOnlyList<string> InterestOptions =
+    [
+        "Tech",
+        "Music",
+        "Gaming",
+        "Books",
+        "Coffee",
+        "Design",
+        "Sports",
+        "Hiking",
+        "Art",
+        "Volunteering",
+        "Board games",
+        "Festivals",
+        "Photography",
+        "Hackathons",
+        "Travel",
+        "Fitness",
+    ];
+
     public static readonly IReadOnlyList<string> LocationOptions =
     [
         "Alba Iulia",
@@ -60,6 +92,8 @@ public class MatchmakingEditViewModel
 
     public string Interests { get; set; } = string.Empty;
 
+    public List<string> SelectedInterests { get; set; } = [];
+
     public string PhotoUrls { get; set; } = string.Empty;
 
     public string ExistingPhotoUrls { get; set; } = string.Empty;
@@ -83,6 +117,8 @@ public class MatchmakingEditViewModel
             return new MatchmakingEditViewModel
             {
                 DisplayName = fallbackName,
+                PreferredGenders = "Everyone",
+                PreferredGenderSelections = ["Everyone"],
             };
         }
 
@@ -94,6 +130,7 @@ public class MatchmakingEditViewModel
             Location = profile.Location,
             DatingBio = profile.DatingBio,
             Interests = string.Join(", ", profile.Interests.Select(interest => interest.Name)),
+            SelectedInterests = profile.Interests.Select(interest => interest.Name).ToList(),
             PhotoUrls = string.Join(Environment.NewLine, profile.Photos.OrderBy(photo => photo.SortOrder).Select(photo => photo.Url)),
             ExistingPhotoUrls = string.Join(Environment.NewLine, profile.Photos.OrderBy(photo => photo.SortOrder).Select(photo => photo.Url)),
             MinPreferredAge = profile.MinPreferredAge,

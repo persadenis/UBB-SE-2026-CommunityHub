@@ -49,7 +49,7 @@ namespace ChatAndEvents.Web.Controllers
                     var principal = new ClaimsPrincipal(identity);
 
                     await HttpContext.SignInAsync("Cookies", principal);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "MainWindow");
                 }
 
                 ModelState.AddModelError(string.Empty, "Invalid credentials");

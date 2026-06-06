@@ -1,0 +1,67 @@
+@model ChatAndEvents.Web.Models.CommunityIndexViewModel
+
+@{
+    ViewData["Title"] = "Discover Communities";
+}
+
+<div class="hub-page wp-board-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Discover</h1>
+            <p class="text-muted mb-0">Search categories, join groups, and follow the conversations that fit you.</p>
+        </div>
+    </div>
+
+    @if (TempData["CommunityMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["CommunityMessage"]</div>
+    }
+
+    <form asp-action="Discover" method="get" class="filter-bar">
+        <input name="query" value="@Model.Query" class="form-control" placeholder="Search communities" />
+        <select name="category" class="form-select">
+            <option value="">All categories</option>
+            @foreach (var category in Model.Categories)
+            {
+                <option value="@category" selected="@(category == Model.Category)">@category</option>
+            }
+        </select>
+        <button class="btn btn-primary" type="submit">Search</button>
+        <a asp-action="Discover" class="btn btn-outline-secondary">Clear</a>
+    </form>
+
+    <section class="hub-panel">
+        <div class="community-list">
+            @if (!Model.Communities.Any())
+            {
+                <p class="text-muted mb-0">No communities found.</p>
+            }
+            else
+            {
+                @foreach (var item in Model.Communities)
+                {
+                    <a class="community-list-item wp-post-card wp-community-post" asp-action="Details" asp-route-id="@item.Community.Id">
+                        @if (!string.IsNullOrWhiteSpace(item.Community.BannerUrl))
+                        {
+                            <img class="wp-community-thumb" src="@item.Community.BannerUrl" alt="@item.Community.Name banner" />
+                        }
+                        <div class="wp-vote-stack">
+                            <span>▲</span>
+                            <strong>@item.MemberCount</strong>
+                            <span>▼</span>
+                        </div>
+                        <div class="wp-post-body">
+                            <div class="wp-post-meta">
+                                <strong>@item.Community.Category</strong>
+                                <span>@(item.IsCurrentUserMember ? "Joined" : "Discovery")</span>
+                            </div>
+                            <h3>@item.Community.Name</h3>
+                            <p>@item.Community.Description</p>
+                        </div>
+                        <div class="wp-comment-badge">@item.MemberCount</div>
+                    </a>
+                }
+            }
+        </div>
+    </section>
+</div>

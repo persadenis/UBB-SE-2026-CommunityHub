@@ -14,12 +14,21 @@ namespace ChatAndEvents.Web.Controllers;
 [Authorize]
 public class ProfileController : Controller
 {
+    private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+    };
+
     private readonly IProfileService _profileService;
     private readonly IFriendRequestService _friendRequestService;
     private readonly IBlockService _blockService;
     private readonly IDirectMessageService _directMessageService;
     private readonly IMatchmakingService _matchmakingService;
     private readonly CurrentUserContext _currentUserContext;
+    private readonly IWebHostEnvironment _environment;
 
     public ProfileController(
         IProfileService profileService,
@@ -27,7 +36,8 @@ public class ProfileController : Controller
         IBlockService blockService,
         IDirectMessageService directMessageService,
         IMatchmakingService matchmakingService,
-        CurrentUserContext currentUserContext)
+        CurrentUserContext currentUserContext,
+        IWebHostEnvironment environment)
     {
         _profileService = profileService;
         _friendRequestService = friendRequestService;
@@ -35,6 +45,7 @@ public class ProfileController : Controller
         _directMessageService = directMessageService;
         _matchmakingService = matchmakingService;
         _currentUserContext = currentUserContext;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -85,13 +96,50 @@ public class ProfileController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Save(string? bio, string? avatarUrl, DateTime? birthday, UserStatus status)
+    public async Task<IActionResult> Save(string? bio, string? avatarUrl, IFormFile? avatarFile, DateTime? birthday, UserStatus status)
     {
+        var uploadedAvatarUrl = await SaveAvatarAsync(avatarFile);
+        if (!string.IsNullOrWhiteSpace(uploadedAvatarUrl))
+        {
+            avatarUrl = uploadedAvatarUrl;
+        }
+
         await _profileService.UpdateProfileAsync(_currentUserContext.UserId, bio, avatarUrl, birthday);
         await _profileService.UpdateStatusAsync(_currentUserContext.UserId, status);
         TempData["ProfileActionMessage"] = "Profile saved.";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<string?> SaveAvatarAsync(IFormFile? avatarFile)
+    {
+        if (avatarFile == null || avatarFile.Length == 0)
+        {
+            return null;
+        }
+
+        var extension = Path.GetExtension(avatarFile.FileName);
+        if (!AllowedImageExtensions.Contains(extension))
+        {
+            TempData["ProfileActionMessage"] = "Only JPG, PNG, and WebP profile pictures are supported.";
+            return null;
+        }
+
+        var uploadFolder = Path.Combine(
+            _environment.WebRootPath,
+            "uploads",
+            "profiles",
+            _currentUserContext.UserId.ToString("N"));
+
+        Directory.CreateDirectory(uploadFolder);
+
+        var fileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+        var path = Path.Combine(uploadFolder, fileName);
+
+        await using var stream = System.IO.File.Create(path);
+        await avatarFile.CopyToAsync(stream);
+
+        return $"/uploads/profiles/{_currentUserContext.UserId:N}/{fileName}";
     }
 
     [HttpPost]
@@ -147,6 +195,6 @@ public class ProfileController : Controller
         return RedirectToAction(
             "Index",
             "Chat",
-            new { conversationId = conversation.Id, currentUserId = _currentUserContext.UserId });
+            new { conversationId = conversation.Id });
     }
 }

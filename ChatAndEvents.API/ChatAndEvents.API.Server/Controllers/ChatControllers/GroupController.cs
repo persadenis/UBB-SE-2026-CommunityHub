@@ -15,17 +15,18 @@ public class GroupController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateGroup(
-        [FromQuery] Guid creatorId,
-        [FromQuery] string title,
-        [FromQuery] string? iconUrl,
-        [FromBody] List<Guid> memberIds)
+    public async Task<IActionResult> CreateGroup([FromBody] CreateGroupRequest request)
     {
+        if (request.CreatorId == Guid.Empty || string.IsNullOrWhiteSpace(request.Title))
+        {
+            return BadRequest("Creator and title are required.");
+        }
+
         var group = await _groupService.CreateGroupAsync(
-            creatorId,
-            title,
-            iconUrl,
-            memberIds);
+            request.CreatorId,
+            request.Title,
+            request.IconUrl,
+            request.MemberIds);
 
         return Ok(group);
     }
@@ -88,5 +89,16 @@ public class GroupController : ControllerBase
             eventDate);
 
         return NoContent();
+    }
+
+    public sealed class CreateGroupRequest
+    {
+        public Guid CreatorId { get; set; }
+
+        public string Title { get; set; } = string.Empty;
+
+        public string? IconUrl { get; set; }
+
+        public List<Guid> MemberIds { get; set; } = [];
     }
 }

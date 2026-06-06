@@ -47,13 +47,16 @@
                 </select>
             </div>
             <div class="col-md-6">
-                <label asp-for="PreferredGenders" class="form-label">Preferred gender(s)</label>
-                <select asp-for="PreferredGenderSelections" class="form-select" multiple size="4" required>
+                <label asp-for="PreferredGenders" class="form-label">Preferred gender</label>
+                <input asp-for="PreferredGenders" type="hidden" id="PreferredGenders" />
+                <div class="wp-choice-row" data-choice-group="single" data-target="PreferredGenders">
                     @foreach (var preference in MatchmakingEditViewModel.PreferredGenderOptions)
                     {
-                        <option value="@preference" selected="@Model.PreferredGenderSelections.Contains(preference)">@preference</option>
+                        var isSelected = string.Equals(Model.PreferredGenders, preference, StringComparison.OrdinalIgnoreCase)
+                            || Model.PreferredGenderSelections.Contains(preference);
+                        <button type="button" class="wp-choice-chip @(isSelected ? "is-selected" : "")" data-value="@preference">@preference</button>
                     }
-                </select>
+                </div>
             </div>
             <div class="col-md-4">
                 <label asp-for="MinPreferredAge" class="form-label">Min age</label>
@@ -70,13 +73,29 @@
         </div>
 
         <label asp-for="LoverType" class="form-label">Lover type / vibe</label>
-        <input asp-for="LoverType" class="form-control" placeholder="Adventure seeker, cozy planner, spontaneous..." />
+        <input asp-for="LoverType" type="hidden" id="LoverType" />
+        <div class="wp-choice-row" data-choice-group="single" data-target="LoverType">
+            @foreach (var loverType in MatchmakingEditViewModel.LoverTypeOptions)
+            {
+                var isSelected = string.Equals(Model.LoverType, loverType, StringComparison.OrdinalIgnoreCase);
+                <button type="button" class="wp-choice-chip @(isSelected ? "is-selected" : "")" data-value="@loverType">@loverType</button>
+            }
+        </div>
 
         <label asp-for="DatingBio" class="form-label">Dating bio</label>
         <textarea asp-for="DatingBio" class="form-control" rows="4" maxlength="1000"></textarea>
 
         <label asp-for="Interests" class="form-label">Interests</label>
-        <textarea asp-for="Interests" class="form-control" rows="3" placeholder="Music, Travel, Gaming"></textarea>
+        <input asp-for="Interests" type="hidden" id="Interests" />
+        <div class="wp-choice-row" data-choice-group="multiple" data-target="Interests">
+            @foreach (var interest in MatchmakingEditViewModel.InterestOptions)
+            {
+                var isSelected = Model.SelectedInterests.Contains(interest, StringComparer.OrdinalIgnoreCase)
+                    || Model.Interests.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                        .Contains(interest, StringComparer.OrdinalIgnoreCase);
+                <button type="button" class="wp-choice-chip @(isSelected ? "is-selected" : "")" data-value="@interest">@interest</button>
+            }
+        </div>
 
         @if (!string.IsNullOrWhiteSpace(Model.ExistingPhotoUrls))
         {
@@ -95,3 +114,29 @@
         <button type="submit" class="btn btn-primary">Save Matchmaking Profile</button>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('[data-choice-group]').forEach(group => {
+            const target = document.getElementById(group.dataset.target);
+            const sync = () => {
+                const selected = Array.from(group.querySelectorAll('.wp-choice-chip.is-selected'))
+                    .map(chip => chip.dataset.value);
+                target.value = selected.join(', ');
+            };
+
+            group.querySelectorAll('.wp-choice-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    if (group.dataset.choiceGroup === 'single') {
+                        group.querySelectorAll('.wp-choice-chip').forEach(item => item.classList.remove('is-selected'));
+                    }
+
+                    chip.classList.toggle('is-selected');
+                    sync();
+                });
+            });
+
+            sync();
+        });
+    </script>
+}

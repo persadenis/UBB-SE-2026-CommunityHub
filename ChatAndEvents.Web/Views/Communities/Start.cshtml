@@ -1,0 +1,39 @@
+@model ChatAndEvents.Web.Models.CommunityIndexViewModel
+
+@{
+    ViewData["Title"] = "Start Community";
+}
+
+<div class="hub-page wp-board-page">
+    <div class="page-title-row">
+        <div>
+            <h1>Start a Community</h1>
+            <p class="text-muted mb-0">Create a new space for people, posts, and shared interests.</p>
+        </div>
+    </div>
+
+    @if (TempData["CommunityMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["CommunityMessage"]</div>
+    }
+
+    <section class="hub-panel wp-start-panel">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" class="stack-form">
+            @Html.AntiForgeryToken()
+            <div>
+                <label class="form-label" for="bannerFile">Community banner</label>
+                <input id="bannerFile" name="bannerFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            </div>
+            <input name="name" class="form-control wp-title-input" placeholder="Pick a name..." maxlength="120" required />
+            <select name="category" class="form-select">
+                <option value="">General</option>
+                @foreach (var category in Model.Categories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+            <textarea name="description" class="form-control" rows="4" placeholder="Description" maxlength="1000" required></textarea>
+            <button type="submit" class="btn wp-primary-button">Create the community</button>
+        </form>
+    </section>
+</div>

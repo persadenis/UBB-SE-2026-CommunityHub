@@ -15,22 +15,32 @@ namespace ChatAndEvents.Web.Controllers;
 public class CreateEventController : Controller
 {
     private const string WizardStateSessionKey = "CreateEventWizardState";
+    private static readonly HashSet<string> AllowedImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+    };
 
     private readonly IUserService _userService;
     private readonly IEventService _eventService;
     private readonly IQuestService _questService;
     private readonly IAttendedEventService _attendedEventService;
+    private readonly IWebHostEnvironment _environment;
 
     public CreateEventController(
         IUserService userService,
         IEventService eventService,
         IQuestService questService,
-        IAttendedEventService attendedEventService)
+        IAttendedEventService attendedEventService,
+        IWebHostEnvironment environment)
     {
         _userService = userService;
         _eventService = eventService;
         _questService = questService;
         _attendedEventService = attendedEventService;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -62,7 +72,7 @@ public class CreateEventController : Controller
     public async Task<IActionResult> GoToStep3(CreateEventViewModel postedModel)
     {
         var model = await LoadViewModelAsync();
-        ApplyStep2(postedModel, model);
+        await ApplyStep2Async(postedModel, model);
         model.ErrorMessage = null;
         model.CurrentStep = 3;
 
@@ -75,7 +85,7 @@ public class CreateEventController : Controller
     public async Task<IActionResult> GoBackToStep1(CreateEventViewModel postedModel)
     {
         var model = await LoadViewModelAsync();
-        ApplyStep2(postedModel, model);
+        await ApplyStep2Async(postedModel, model);
         model.ErrorMessage = null;
         model.CurrentStep = 1;
 
@@ -288,12 +298,37 @@ public class CreateEventController : Controller
         target.IsPublic = source.IsPublic;
     }
 
-    private static void ApplyStep2(CreateEventViewModel source, CreateEventViewModel target)
+    private async Task ApplyStep2Async(CreateEventViewModel source, CreateEventViewModel target)
     {
         target.Description = source.Description;
         target.MaximumPeopleText = source.MaximumPeopleText;
-        target.EventBannerPath = source.EventBannerPath;
+        target.EventBannerPath = await SaveBannerAsync(source.EventBannerFile) ?? source.EventBannerPath;
         target.SelectedCategoryId = source.SelectedCategoryId;
+    }
+
+    private async Task<string?> SaveBannerAsync(IFormFile? bannerFile)
+    {
+        if (bannerFile == null || bannerFile.Length == 0)
+        {
+            return null;
+        }
+
+        var extension = Path.GetExtension(bannerFile.FileName);
+        if (!AllowedImageExtensions.Contains(extension))
+        {
+            return null;
+        }
+
+        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "events");
+        Directory.CreateDirectory(uploadFolder);
+
+        var fileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+        var path = Path.Combine(uploadFolder, fileName);
+
+        await using var stream = System.IO.File.Create(path);
+        await bannerFile.CopyToAsync(stream);
+
+        return $"/uploads/events/{fileName}";
     }
 
     private static List<Quest> BuildSelectedQuests(CreateEventViewModel model)

@@ -12,6 +12,8 @@ public class HubCommunity
 
     public string Category { get; set; } = "General";
 
+    public string? BannerUrl { get; set; }
+
     public Guid OwnerId { get; set; }
 
     public User? Owner { get; set; }
