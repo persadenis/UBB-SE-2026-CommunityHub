@@ -9,7 +9,7 @@ namespace ChatModule
 {
     public sealed partial class WebShellWindow : Window
     {
-        private static readonly Uri WebAppUri = new("http://localhost:5076/Auth/Login");
+        private static readonly Uri WebAppUri = ResolveWebAppUri();
         private static readonly Uri ApiUri = new("http://localhost:5572/");
         private static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(2);
         private static readonly TimeSpan StartupTimeout = TimeSpan.FromSeconds(35);
@@ -23,7 +23,14 @@ namespace ChatModule
 
         private async Task LoadHubAsync()
         {
-            await EnsureLocalServersAsync();
+            if (IsLocalHost(WebAppUri))
+            {
+                await EnsureLocalServersAsync();
+            }
+            else
+            {
+                await WaitForEndpointAsync(WebAppUri);
+            }
 
             HubWebView.Source = WebAppUri;
             HubWebView.Visibility = Visibility.Visible;
@@ -110,6 +117,25 @@ namespace ChatModule
                 "dotnet.exe");
 
             return File.Exists(localDotnet) ? localDotnet : "dotnet";
+        }
+
+        private static Uri ResolveWebAppUri()
+        {
+            var configuredUrl = Environment.GetEnvironmentVariable("COMMUNITYHUB_WEB_URL");
+            if (!string.IsNullOrWhiteSpace(configuredUrl) &&
+                Uri.TryCreate(configuredUrl, UriKind.Absolute, out var configuredUri))
+            {
+                return configuredUri;
+            }
+
+            return new Uri("https://communityhub-web-persadenis.onrender.com/Auth/Login");
+        }
+
+        private static bool IsLocalHost(Uri uri)
+        {
+            return uri.IsLoopback ||
+                uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+                uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase);
         }
 
         private static string? FindSolutionRoot()
