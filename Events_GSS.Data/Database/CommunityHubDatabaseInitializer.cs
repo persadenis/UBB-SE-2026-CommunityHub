@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ChatAndEvents.Data.Database;
 
@@ -6,6 +8,12 @@ public static class CommunityHubDatabaseInitializer
 {
     public static async Task InitializeAsync(AppDbContext db)
     {
+        if (IsPostgres(db))
+        {
+            await EnsurePostgresSchemaAsync(db);
+            return;
+        }
+
         await db.Database.EnsureCreatedAsync();
 
         if (!db.Database.IsSqlServer())
@@ -146,6 +154,40 @@ public static class CommunityHubDatabaseInitializer
         foreach (var statement in statements)
         {
             await db.Database.ExecuteSqlRawAsync(statement);
+        }
+    }
+
+    private static bool IsPostgres(AppDbContext db)
+    {
+        return db.Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    private static async Task EnsurePostgresSchemaAsync(AppDbContext db)
+    {
+        await db.Database.OpenConnectionAsync();
+        try
+        {
+            await db.Database.ExecuteSqlRawAsync("CREATE SCHEMA IF NOT EXISTS communityhub;");
+
+            var hasUsersTable = await db.Database.SqlQueryRaw<int>(
+                """
+                SELECT CASE WHEN EXISTS (
+                    SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = 'communityhub'
+                      AND table_name = 'Users'
+                ) THEN 1 ELSE 0 END
+                """).SingleAsync();
+
+            if (hasUsersTable == 0)
+            {
+                var databaseCreator = db.GetService<IRelationalDatabaseCreator>();
+                await databaseCreator.CreateTablesAsync();
+            }
+        }
+        finally
+        {
+            await db.Database.CloseConnectionAsync();
         }
     }
 }

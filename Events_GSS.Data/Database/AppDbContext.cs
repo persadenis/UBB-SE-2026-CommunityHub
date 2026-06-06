@@ -58,6 +58,11 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        if (Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            modelBuilder.HasDefaultSchema("communityhub");
+        }
+
         modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new FriendConfiguration());
         modelBuilder.ApplyConfiguration(new ConversationConfiguration());
