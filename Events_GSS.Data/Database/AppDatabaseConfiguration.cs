@@ -24,6 +24,7 @@ public static class AppDatabaseConfiguration
         var usePostgres = IsPostgresProvider(provider) || IsPostgresUrl(resolvedConnectionString);
         if (usePostgres)
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             options.UseNpgsql(ToNpgsqlConnectionString(resolvedConnectionString));
         }
         else
