@@ -18,9 +18,7 @@ services:
       - key: DatabaseProvider
         value: PostgreSQL
       - key: ConnectionStrings__ChatAndEventsDB
-        fromDatabase:
-          name: communityhub-db
-          property: connectionString
+        sync: false
 
   - type: web
     name: communityhub-web
@@ -43,12 +41,4 @@ services:
       - key: Api__BaseAddress
         value: https://communityhub-api.onrender.com/
       - key: ConnectionStrings__ChatAndEventsDB
-        fromDatabase:
-          name: communityhub-db
-          property: connectionString
-
-databases:
-  - name: communityhub-db
-    databaseName: communityhub
-    user: communityhub
-    plan: free
+        sync: false

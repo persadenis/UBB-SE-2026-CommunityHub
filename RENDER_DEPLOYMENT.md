@@ -2,7 +2,7 @@
 
 This app deploys to Render as:
 
-- `communityhub-db`: free Render Postgres database
+- an existing free Render Postgres database
 - `communityhub-api-persadenis`: public free Docker API web service
 - `communityhub-web-persadenis`: public free Docker web service
 
@@ -19,16 +19,19 @@ This Blueprint avoids paid Render resources, but the free tier has limitations:
 
 ## Deploy With Blueprint
 
-1. Push this repo to GitHub.
-2. Go to Render Dashboard.
-3. Click `New +`.
-4. Select `Blueprint`.
-5. Connect `https://github.com/persadenis/UBB-SE-2026-CommunityHub`.
-6. Select branch `main`.
-7. Render should detect `render.yaml`.
-8. Apply the blueprint.
+1. Open your existing free Render Postgres database.
+2. Copy its internal connection string.
+3. Push this repo to GitHub.
+4. Go to Render Dashboard.
+5. Click `New +`.
+6. Select `Blueprint`.
+7. Connect `https://github.com/persadenis/UBB-SE-2026-CommunityHub`.
+8. Select branch `main`.
+9. Render should detect `render.yaml`.
+10. When Render asks for `ConnectionStrings__ChatAndEventsDB`, paste the same Postgres connection string for both services.
+11. Apply the blueprint.
 
-Render will create the Postgres database and automatically pass its connection string to both services.
+The Blueprint reuses your existing free Postgres database instead of creating a second one.
 
 The public app URL is the `communityhub-web-persadenis` service URL.
 
