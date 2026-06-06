@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ChatAndEvents.Data.ChatData.serviceInterfaces.Services;
@@ -53,6 +54,27 @@ namespace ChatAndEvents.Web.Controllers
 
             return View(viewModel);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Messages(Guid conversationId)
+        {
+            var currentUserId = _currentUserContext.UserId;
+            var messages = await _messageService.GetMessagesAsync(conversationId, currentUserId, 0, 100);
+
+            await _readReceiptService.MarkLatestAsReadAsync(conversationId, currentUserId);
+
+            return Json(new
+            {
+                messages = messages.Select(message => new
+                {
+                    id = message.Id,
+                    senderUsername = message.SenderUsername ?? "Unknown",
+                    content = message.Content ?? string.Empty,
+                    createdAt = message.CreatedAt.ToLocalTime().ToString("HH:mm"),
+                    isMine = message.UserId == currentUserId
+                })
+            });
+        }
         
         [HttpPost]
         public async Task<IActionResult> SendMessage(Guid conversationId, string messageInput)
@@ -64,6 +86,26 @@ namespace ChatAndEvents.Web.Controllers
             }
             
             return RedirectToAction("Index", new { conversationId = conversationId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendMessageJson(Guid conversationId, string messageInput)
+        {
+            var currentUserId = _currentUserContext.UserId;
+            if (string.IsNullOrWhiteSpace(messageInput))
+            {
+                return BadRequest(new { error = "Message cannot be empty." });
+            }
+
+            try
+            {
+                await _messageService.SendMessageAsync(conversationId, currentUserId, messageInput, null);
+                return Ok(new { ok = true });
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(new { error = exception.Message });
+            }
         }
     }
 }

@@ -16,7 +16,12 @@
         </div>
     </div>
 
-    <div class="chat-messages p-3 bg-light" style="height: 500px; overflow-y: auto;">
+    <div id="chatStatus" class="chat-status px-3 py-2 text-muted small" aria-live="polite"></div>
+
+    <div id="chatMessages"
+         class="chat-messages p-3 bg-light"
+         style="height: 500px; overflow-y: auto;"
+         data-conversation-id="@Model.ConversationId">
         @if (Model.ErrorMessage != null)
         {
             <div class="alert alert-danger">@Model.ErrorMessage</div>
@@ -24,9 +29,9 @@
 
         @foreach (var message in Model.Messages)
         {
-            <div class="message mb-3 p-2 border rounded">
+            <div class="message mb-3 p-2 border rounded @(message.UserId == Model.CurrentUserId ? "message-mine" : "")" data-message-id="@message.Id">
                 <strong>@(message.SenderUsername ?? "Unknown")</strong>
-                <small class="text-muted">@message.CreatedAt.ToShortTimeString()</small>
+                <small class="text-muted">@message.CreatedAt.ToLocalTime().ToString("HH:mm")</small>
                 <p class="mb-0">@message.Content</p>
             </div>
         }
@@ -39,12 +44,159 @@
         }
         else
         {
-            <form asp-controller="Chat" asp-action="SendMessage" method="post" class="d-flex">
+            <form id="chatForm" asp-controller="Chat" asp-action="SendMessage" method="post" class="d-flex">
                 <input type="hidden" name="conversationId" value="@Model.ConversationId" />
 
-                <input type="text" name="messageInput" class="form-control me-2" placeholder="Type a message..." required />
-                <button type="submit" class="btn btn-success">Send</button>
+                <input id="chatMessageInput" type="text" name="messageInput" class="form-control me-2" placeholder="Type a message..." autocomplete="off" required />
+                <button id="chatSendButton" type="submit" class="btn btn-success">Send</button>
             </form>
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const messagesEl = document.getElementById('chatMessages');
+            const form = document.getElementById('chatForm');
+            const input = document.getElementById('chatMessageInput');
+            const sendButton = document.getElementById('chatSendButton');
+            const statusEl = document.getElementById('chatStatus');
+
+            if (!messagesEl) {
+                return;
+            }
+
+            const conversationId = messagesEl.dataset.conversationId;
+            const messagesUrl = '@Url.Action("Messages", "Chat")' + '?conversationId=' + encodeURIComponent(conversationId);
+            const sendUrl = '@Url.Action("SendMessageJson", "Chat")';
+            let isRefreshing = false;
+            let lastSignature = '';
+
+            const setStatus = (message, isError = false) => {
+                if (!statusEl) {
+                    return;
+                }
+
+                statusEl.textContent = message || '';
+                statusEl.classList.toggle('text-danger', isError);
+                statusEl.classList.toggle('text-muted', !isError);
+            };
+
+            const isNearBottom = () => messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 90;
+            const scrollToBottom = () => {
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            };
+
+            const createMessageElement = (message) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'message mb-3 p-2 border rounded' + (message.isMine ? ' message-mine' : '');
+                wrapper.dataset.messageId = message.id;
+
+                const author = document.createElement('strong');
+                author.textContent = message.senderUsername || 'Unknown';
+
+                const time = document.createElement('small');
+                time.className = 'text-muted ms-2';
+                time.textContent = message.createdAt || '';
+
+                const content = document.createElement('p');
+                content.className = 'mb-0';
+                content.textContent = message.content || '';
+
+                wrapper.append(author, time, content);
+                return wrapper;
+            };
+
+            const renderMessages = (messages) => {
+                const signature = messages.map(message => `${message.id}:${message.content}:${message.createdAt}`).join('|');
+                if (signature === lastSignature) {
+                    return;
+                }
+
+                const shouldStickToBottom = isNearBottom();
+                messagesEl.replaceChildren(...messages.map(createMessageElement));
+                lastSignature = signature;
+
+                if (shouldStickToBottom) {
+                    scrollToBottom();
+                }
+            };
+
+            const refreshMessages = async () => {
+                if (isRefreshing) {
+                    return;
+                }
+
+                isRefreshing = true;
+                try {
+                    const response = await fetch(messagesUrl, {
+                        headers: { 'Accept': 'application/json' },
+                        cache: 'no-store'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Could not refresh messages.');
+                    }
+
+                    const data = await response.json();
+                    renderMessages(data.messages || []);
+                    setStatus('');
+                } catch (error) {
+                    setStatus(error.message || 'Live chat is trying to reconnect.', true);
+                } finally {
+                    isRefreshing = false;
+                }
+            };
+
+            form?.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const text = input?.value.trim();
+                if (!text) {
+                    return;
+                }
+
+                sendButton.disabled = true;
+                setStatus('Sending...');
+
+                try {
+                    const formData = new FormData();
+                    formData.append('conversationId', conversationId);
+                    formData.append('messageInput', text);
+
+                    const response = await fetch(sendUrl, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!response.ok) {
+                        let errorMessage = 'Message could not be sent.';
+                        try {
+                            const payload = await response.json();
+                            errorMessage = payload.error || errorMessage;
+                        } catch {
+                            // Keep the generic message when the server returns non-JSON.
+                        }
+
+                        throw new Error(errorMessage);
+                    }
+
+                    input.value = '';
+                    await refreshMessages();
+                    scrollToBottom();
+                    input.focus();
+                } catch (error) {
+                    setStatus(error.message || 'Message could not be sent.', true);
+                } finally {
+                    sendButton.disabled = false;
+                }
+            });
+
+            scrollToBottom();
+            refreshMessages();
+            window.setInterval(refreshMessages, 2000);
+        })();
+    </script>
+}
