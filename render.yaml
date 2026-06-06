@@ -6,7 +6,6 @@ services:
     branch: main
     dockerfilePath: ./Dockerfile.api
     dockerContext: .
-    healthCheckPath: /health
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
