@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: communityhub-api-persadenis
+    name: communityhub-api
     runtime: docker
     repo: https://github.com/persadenis/UBB-SE-2026-CommunityHub
     branch: main
@@ -23,7 +23,7 @@ services:
           property: connectionString
 
   - type: web
-    name: communityhub-web-persadenis
+    name: communityhub-web
     runtime: docker
     repo: https://github.com/persadenis/UBB-SE-2026-CommunityHub
     branch: main
@@ -41,7 +41,7 @@ services:
       - key: DatabaseProvider
         value: PostgreSQL
       - key: Api__BaseAddress
-        value: https://communityhub-api-persadenis.onrender.com/
+        value: https://communityhub-api.onrender.com/
       - key: ConnectionStrings__ChatAndEventsDB
         fromDatabase:
           name: communityhub-db
