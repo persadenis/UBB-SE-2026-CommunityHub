@@ -951,8 +951,33 @@ html {
 }
 
 .wp-community-post {
+  grid-template-columns: 108px minmax(0, 1fr);
   align-items: stretch;
   padding: 15px;
+}
+
+.wp-community-rail {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
+  justify-items: center;
+  gap: 10px;
+  width: 108px;
+}
+
+.wp-community-post .wp-vote-stack {
+  width: 58px;
+  min-height: 64px;
+}
+
+.wp-community-post .wp-post-body {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.wp-community-post .wp-post-body p {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .wp-match-empty {
@@ -1737,5 +1762,22 @@ html {
   .wp-vote-stack,
   .wp-comment-badge {
     display: none;
+  }
+
+  .wp-community-post {
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+
+  .wp-community-rail {
+    width: 88px;
+  }
+
+  .wp-community-thumb {
+    width: 88px;
+    height: 66px;
+  }
+
+  .wp-community-post .wp-vote-stack {
+    display: grid;
   }
 }

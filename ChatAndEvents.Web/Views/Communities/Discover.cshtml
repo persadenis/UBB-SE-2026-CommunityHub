@@ -41,14 +41,16 @@
                 @foreach (var item in Model.Communities)
                 {
                     <a class="community-list-item wp-post-card wp-community-post" asp-action="Details" asp-route-id="@item.Community.Id">
-                        @if (!string.IsNullOrWhiteSpace(item.Community.BannerUrl))
-                        {
-                            <img class="wp-community-thumb" src="@item.Community.BannerUrl" alt="@item.Community.Name banner" />
-                        }
-                        <div class="wp-vote-stack">
-                            <span>▲</span>
-                            <strong>@item.MemberCount</strong>
-                            <span>▼</span>
+                        <div class="wp-community-rail">
+                            @if (!string.IsNullOrWhiteSpace(item.Community.BannerUrl))
+                            {
+                                <img class="wp-community-thumb" src="@item.Community.BannerUrl" alt="@item.Community.Name banner" />
+                            }
+                            <div class="wp-vote-stack">
+                                <span>&#9650;</span>
+                                <strong>@item.MemberCount</strong>
+                                <span>&#9660;</span>
+                            </div>
                         </div>
                         <div class="wp-post-body">
                             <div class="wp-post-meta">
@@ -58,7 +60,6 @@
                             <h3>@item.Community.Name</h3>
                             <p>@item.Community.Description</p>
                         </div>
-                        <div class="wp-comment-badge">@item.MemberCount</div>
                     </a>
                 }
             }
