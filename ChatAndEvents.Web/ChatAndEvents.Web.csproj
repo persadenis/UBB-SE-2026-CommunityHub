@@ -22,4 +22,8 @@
     <Compile Include="..\ChatModule\src\HttpService\SearchHttpService.cs" Link="ExternalServices\SearchHttpService.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+  </ItemGroup>
+
 </Project>

@@ -8,6 +8,11 @@ public static class CommunityHubDatabaseInitializer
     {
         await db.Database.EnsureCreatedAsync();
 
+        if (!db.Database.IsSqlServer())
+        {
+            return;
+        }
+
         var statements = new[]
         {
             """

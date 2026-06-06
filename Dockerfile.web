@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ChatAndEvents.Web/ChatAndEvents.Web.csproj ChatAndEvents.Web/
+COPY Events_GSS.Data/ChatAndEvents.Data.csproj Events_GSS.Data/
+RUN dotnet restore ChatAndEvents.Web/ChatAndEvents.Web.csproj
+
+COPY . .
+RUN dotnet publish ChatAndEvents.Web/ChatAndEvents.Web.csproj -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENTRYPOINT ["sh", "-c", "dotnet ChatAndEvents.Web.dll --urls http://0.0.0.0:${PORT:-10000}"]
+

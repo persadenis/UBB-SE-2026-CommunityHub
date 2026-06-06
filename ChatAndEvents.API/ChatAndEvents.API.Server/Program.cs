@@ -37,7 +37,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ChatAndEventsDB") ?? throw new InvalidOperationException("Connection string 'ChatAndEventsDB' not found.")));
+    options.UseConfiguredDatabase(
+        builder.Configuration.GetConnectionString("ChatAndEventsDB"),
+        builder.Configuration["DatabaseProvider"],
+        builder.Configuration["DATABASE_URL"]));
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -115,11 +118,13 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 
-if (!app.Environment.IsDevelopment())
+var isRender = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("RENDER"));
+if (!app.Environment.IsDevelopment() && !isRender)
 {
     app.UseHttpsRedirection();
 }
 app.UseAuthorization();
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("OK"));
 app.MapDefaultEndpoints();
 app.Run();

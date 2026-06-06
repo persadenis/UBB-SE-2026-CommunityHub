@@ -6,6 +6,7 @@ using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatAndEvents.Data.ChatData.serviceInterfaces.Services;
 using ChatAndEvents.Data.ChatData.services;
 using ChatAndEvents.Web.Models;
+using ChatAndEvents.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,7 @@ public class MatchmakingController : Controller
     private readonly IUserService _userService;
     private readonly IDirectMessageService _directMessageService;
     private readonly CurrentUserContext _currentUserContext;
-    private readonly IWebHostEnvironment _environment;
+    private readonly IUploadStorageService _uploadStorage;
     private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
     public MatchmakingController(
@@ -37,7 +38,7 @@ public class MatchmakingController : Controller
         IUserService userService,
         IDirectMessageService directMessageService,
         CurrentUserContext currentUserContext,
-        IWebHostEnvironment environment,
+        IUploadStorageService uploadStorage,
         IDbContextFactory<AppDbContext> contextFactory)
     {
         _matchmakingService = matchmakingService;
@@ -45,7 +46,7 @@ public class MatchmakingController : Controller
         _userService = userService;
         _directMessageService = directMessageService;
         _currentUserContext = currentUserContext;
-        _environment = environment;
+        _uploadStorage = uploadStorage;
         _contextFactory = contextFactory;
     }
 
@@ -216,11 +217,8 @@ public class MatchmakingController : Controller
             return savedUrls;
         }
 
-        var uploadFolder = Path.Combine(
-            _environment.WebRootPath,
-            "uploads",
-            "matchmaking",
-            _currentUserContext.UserId.ToString("N"));
+        var userFolder = _currentUserContext.UserId.ToString("N");
+        var uploadFolder = _uploadStorage.GetUploadPath("matchmaking", userFolder);
 
         Directory.CreateDirectory(uploadFolder);
 
@@ -237,7 +235,7 @@ public class MatchmakingController : Controller
             await using var stream = System.IO.File.Create(path);
             await file.CopyToAsync(stream);
 
-            savedUrls.Add($"/uploads/matchmaking/{_currentUserContext.UserId:N}/{fileName}");
+            savedUrls.Add(_uploadStorage.GetUploadUrl("matchmaking", userFolder, fileName));
         }
 
         return savedUrls;

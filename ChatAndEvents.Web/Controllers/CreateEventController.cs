@@ -6,6 +6,7 @@ using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatAndEvents.Data.EventsData.ViewModelsCore;
 using ChatAndEvents.Web.Extensions;
 using ChatAndEvents.Web.Models;
+using ChatAndEvents.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
@@ -27,20 +28,20 @@ public class CreateEventController : Controller
     private readonly IEventService _eventService;
     private readonly IQuestService _questService;
     private readonly IAttendedEventService _attendedEventService;
-    private readonly IWebHostEnvironment _environment;
+    private readonly IUploadStorageService _uploadStorage;
 
     public CreateEventController(
         IUserService userService,
         IEventService eventService,
         IQuestService questService,
         IAttendedEventService attendedEventService,
-        IWebHostEnvironment environment)
+        IUploadStorageService uploadStorage)
     {
         _userService = userService;
         _eventService = eventService;
         _questService = questService;
         _attendedEventService = attendedEventService;
-        _environment = environment;
+        _uploadStorage = uploadStorage;
     }
 
     [HttpGet]
@@ -319,7 +320,7 @@ public class CreateEventController : Controller
             return null;
         }
 
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "events");
+        var uploadFolder = _uploadStorage.GetUploadPath("events");
         Directory.CreateDirectory(uploadFolder);
 
         var fileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
@@ -328,7 +329,7 @@ public class CreateEventController : Controller
         await using var stream = System.IO.File.Create(path);
         await bannerFile.CopyToAsync(stream);
 
-        return $"/uploads/events/{fileName}";
+        return _uploadStorage.GetUploadUrl("events", fileName);
     }
 
     private static List<Quest> BuildSelectedQuests(CreateEventViewModel model)

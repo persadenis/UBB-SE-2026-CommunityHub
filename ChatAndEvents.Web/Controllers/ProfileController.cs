@@ -7,6 +7,7 @@ using ChatAndEvents.Data.ChatData.services;
 using ChatAndEvents.Data.CommunityHub.Services;
 using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatAndEvents.Web.Models;
+using ChatAndEvents.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 namespace ChatAndEvents.Web.Controllers;
@@ -28,7 +29,7 @@ public class ProfileController : Controller
     private readonly IDirectMessageService _directMessageService;
     private readonly IMatchmakingService _matchmakingService;
     private readonly CurrentUserContext _currentUserContext;
-    private readonly IWebHostEnvironment _environment;
+    private readonly IUploadStorageService _uploadStorage;
 
     public ProfileController(
         IProfileService profileService,
@@ -37,7 +38,7 @@ public class ProfileController : Controller
         IDirectMessageService directMessageService,
         IMatchmakingService matchmakingService,
         CurrentUserContext currentUserContext,
-        IWebHostEnvironment environment)
+        IUploadStorageService uploadStorage)
     {
         _profileService = profileService;
         _friendRequestService = friendRequestService;
@@ -45,7 +46,7 @@ public class ProfileController : Controller
         _directMessageService = directMessageService;
         _matchmakingService = matchmakingService;
         _currentUserContext = currentUserContext;
-        _environment = environment;
+        _uploadStorage = uploadStorage;
     }
 
     [HttpGet]
@@ -125,11 +126,8 @@ public class ProfileController : Controller
             return null;
         }
 
-        var uploadFolder = Path.Combine(
-            _environment.WebRootPath,
-            "uploads",
-            "profiles",
-            _currentUserContext.UserId.ToString("N"));
+        var userFolder = _currentUserContext.UserId.ToString("N");
+        var uploadFolder = _uploadStorage.GetUploadPath("profiles", userFolder);
 
         Directory.CreateDirectory(uploadFolder);
 
@@ -139,7 +137,7 @@ public class ProfileController : Controller
         await using var stream = System.IO.File.Create(path);
         await avatarFile.CopyToAsync(stream);
 
-        return $"/uploads/profiles/{_currentUserContext.UserId:N}/{fileName}";
+        return _uploadStorage.GetUploadUrl("profiles", userFolder, fileName);
     }
 
     [HttpPost]

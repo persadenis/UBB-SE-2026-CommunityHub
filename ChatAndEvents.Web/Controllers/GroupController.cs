@@ -2,6 +2,7 @@
 using ChatAndEvents.Data.ChatData.services;
 using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatAndEvents.Web.Models;
+using ChatAndEvents.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -26,18 +27,18 @@ namespace ChatAndEvents.Web.Controllers
         private readonly IGroupService _groupService;
         private readonly ISearchService _searchService;
         private readonly CurrentUserContext _currentUserContext;
-        private readonly IWebHostEnvironment _environment;
+        private readonly IUploadStorageService _uploadStorage;
 
         public GroupController(
             IGroupService groupService,
             ISearchService searchService,
             CurrentUserContext currentUserContext,
-            IWebHostEnvironment environment)
+            IUploadStorageService uploadStorage)
         {
             _groupService = groupService;
             _searchService = searchService;
             _currentUserContext = currentUserContext;
-            _environment = environment;
+            _uploadStorage = uploadStorage;
         }
 
         private Guid GetCurrentUserId() => _currentUserContext.UserId;
@@ -102,7 +103,7 @@ namespace ChatAndEvents.Web.Controllers
                 throw new InvalidOperationException("Only JPG, PNG, and WebP group icons are supported.");
             }
 
-            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "groups");
+            var uploadFolder = _uploadStorage.GetUploadPath("groups");
             Directory.CreateDirectory(uploadFolder);
 
             var fileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
@@ -111,7 +112,7 @@ namespace ChatAndEvents.Web.Controllers
             await using var stream = System.IO.File.Create(path);
             await iconFile.CopyToAsync(stream);
 
-            return $"/uploads/groups/{fileName}";
+            return _uploadStorage.GetUploadUrl("groups", fileName);
         }
 
         // GET: /Group/SearchUsers?query=alice

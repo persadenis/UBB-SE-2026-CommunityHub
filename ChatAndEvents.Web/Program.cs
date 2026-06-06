@@ -18,17 +18,22 @@ using ChatAndEvents.Data.EventsData.Services.reputationService;
 using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatModule.src.HttpService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Security.Claims;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ChatAndEventsDB")
-        ?? "Server=(localdb)\\MSSQLLocalDB;Database=ChatAndEventsDB;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;"));
+    options.UseConfiguredDatabase(
+        builder.Configuration.GetConnectionString("ChatAndEventsDB")
+            ?? "Server=(localdb)\\MSSQLLocalDB;Database=ChatAndEventsDB;Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;",
+        builder.Configuration["DatabaseProvider"],
+        builder.Configuration["DATABASE_URL"]));
 
 builder.Services.AddScoped<ICommunityHubService, CommunityHubService>();
 builder.Services.AddScoped<IMatchmakingService, MatchmakingService>();
+builder.Services.AddSingleton<ChatAndEvents.Web.Services.IUploadStorageService, ChatAndEvents.Web.Services.UploadStorageService>();
 
 builder.Services.AddScoped<IMessageService, MessageHttpService>(sp =>
 {
@@ -228,7 +233,12 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddHttpClient("API", client =>
 {
-    var apiBaseAddress = builder.Configuration["Api:BaseAddress"] ?? "http://localhost:5572/";
+    var apiHostPort = builder.Configuration["Api:HostPort"]
+        ?? Environment.GetEnvironmentVariable("API_HOSTPORT");
+
+    var apiBaseAddress = !string.IsNullOrWhiteSpace(apiHostPort)
+        ? $"http://{apiHostPort.TrimEnd('/')}/"
+        : builder.Configuration["Api:BaseAddress"] ?? "http://localhost:5572/";
     client.BaseAddress = new Uri(apiBaseAddress);
 })
 .ConfigurePrimaryHttpMessageHandler(() =>
@@ -254,11 +264,23 @@ try
         await CommunityHubDatabaseInitializer.InitializeAsync(db);
     }
 
-    if (!app.Environment.IsDevelopment())
+    var isRender = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("RENDER"));
+    if (!app.Environment.IsDevelopment() && !isRender)
     {
         app.UseHttpsRedirection();
     }
+
+    var uploadsRoot = builder.Configuration["Uploads:Root"]
+        ?? Environment.GetEnvironmentVariable("UPLOADS_ROOT")
+        ?? Path.Combine(app.Environment.WebRootPath, "uploads");
+    Directory.CreateDirectory(uploadsRoot);
+
     app.UseStaticFiles();
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(uploadsRoot),
+        RequestPath = "/uploads",
+    });
     app.UseRouting();
     app.UseSession();
     app.UseAuthentication();
@@ -270,6 +292,7 @@ try
         name: "default",
         pattern: "{controller=MainWindow}/{action=Index}/{id?}");
 
+    app.MapGet("/health", () => Results.Ok("OK")).AllowAnonymous();
 
     app.Run();
 }catch(Exception ex)

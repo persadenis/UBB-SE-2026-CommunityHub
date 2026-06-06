@@ -10,8 +10,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         e.HasKey(u => u.Id);
 
-        e.Property(u => u.Id)
-            .HasDefaultValueSql("NEWID()");
+        e.Property(u => u.Id);
 
         e.Property(u => u.Username)
             .HasMaxLength(16)

@@ -2,6 +2,7 @@ using ChatAndEvents.Data.CommunityHub.Services;
 using ChatAndEvents.Data.EventsData.Services.notificationServices;
 using ChatAndEvents.Data.EventsData.Services.userServices;
 using ChatAndEvents.Web.Models;
+using ChatAndEvents.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,18 +22,18 @@ public class CommunitiesController : Controller
     private readonly ICommunityHubService _communityHubService;
     private readonly INotificationService _notificationService;
     private readonly CurrentUserContext _currentUserContext;
-    private readonly IWebHostEnvironment _environment;
+    private readonly IUploadStorageService _uploadStorage;
 
     public CommunitiesController(
         ICommunityHubService communityHubService,
         INotificationService notificationService,
         CurrentUserContext currentUserContext,
-        IWebHostEnvironment environment)
+        IUploadStorageService uploadStorage)
     {
         _communityHubService = communityHubService;
         _notificationService = notificationService;
         _currentUserContext = currentUserContext;
-        _environment = environment;
+        _uploadStorage = uploadStorage;
     }
 
     [HttpGet]
@@ -101,7 +102,7 @@ public class CommunitiesController : Controller
             return null;
         }
 
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "communities");
+        var uploadFolder = _uploadStorage.GetUploadPath("communities");
         Directory.CreateDirectory(uploadFolder);
 
         var fileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
@@ -110,7 +111,7 @@ public class CommunitiesController : Controller
         await using var stream = System.IO.File.Create(path);
         await bannerFile.CopyToAsync(stream);
 
-        return $"/uploads/communities/{fileName}";
+        return _uploadStorage.GetUploadUrl("communities", fileName);
     }
 
     [HttpGet]
